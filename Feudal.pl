@@ -71,13 +71,15 @@ estadoInicial([[x,0,0,0,0,0,0,0,0,x,x,0,0,0,0,0,0,0,0,0,0,0,0,x],
                [x,0,0,0,0,t,x,0,0,0,0,0,0,0,0,0,0,x,x,0,0,0,0,x]]).
 
 
-show:- estadoInicial(X), print_tab(X).
-show2:-estadoTeste(X), print_tab(X).
+show:- estadoInicial(X), print_tab(X).  %mostra tabuleiro do estado inicial
+show2:-estadoTeste(X), print_tab(X).	%mostra tabuleiro do estado teste com todas as peças colocadas no tabuleiro
 
+%mostra o tabuleiro e as coordenadas respectivemente
 print_tab(Tab):- writeln('    A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X '),
 		 printLists(Tab,1),
 		 writeln('    A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X '),nl.
 
+%desenhar o limite do tabuleiro
 lim:- writeln('   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+').
 
 
@@ -160,6 +162,10 @@ comeca_jogo(Op):-    %para efeito de teste, ainda não está implementado
 	Op == 2, writeln('humano contra computador'), menu_nivel;
 	Op == 3, writeln('computador contra computador'), menu_nivel.
 
+/*
+insere_peca(J,Peca,X,Y,Tab,Tab2).
+remove_peca(J,Peca,X,Y,Tab,Tab2).
+*/
 
 /*
 tipo_jogo(1,humano,humano).
@@ -167,10 +173,11 @@ tipo_jogo(2,humano,computador).
 tipo_jogo(3,computador,computador).
 */
 
+%funcao auxiliar para verificar se a opção do utilizador é valido
 opcao_invalida(Op):-
 	Op \== 1, Op \== 2, Op \== 3.
 
-
+%procede a opção do utilizador
 faz_opcao(Op):-
 	read(Op),
 	not(opcao_invalida(Op)),!;
