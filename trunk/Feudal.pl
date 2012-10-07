@@ -80,8 +80,13 @@ printLists([FList|OList],N):-
 %imprime todos os elementos de cada sublista
 printList([]).
 printList([FElem|OElem]):-
-                        write(' '), write(FElem), write(' |'),
+                        write(' '), draw_casa(FElem), write(' |'),
                         printList(OElem).
+
+draw_casa(Elem):-  %desenha a casa com os valores respectivmente
+	Elem == 0, write(' ');
+	Elem == x, write('X');
+	Elem == t, write('T').
 
 
 start:-
@@ -110,7 +115,7 @@ menu_start:-
 	write(Op), integer(Op),writeln(' um numero'),
 	comeca_jogo(Op).
 
-comeca_jogo(Op):-    %nao sei porque só da true quando Op for 3, quando for 1 or 2 da false, mas em cima diz 1, 2, e 3 são números.
+comeca_jogo(Op):-    %para efeito de teste, ainda não está implementado
 	Op == 1, writeln('humano contra humano');
 	Op == 2, writeln('humano contra computador'), menu_nivel;
 	Op == 3, writeln('computador contra computador'), menu_nivel.
