@@ -111,8 +111,8 @@ menu_start:-
 	comeca_jogo(Op).
 
 comeca_jogo(Op):-    %nao sei porque só da true quando Op for 3, quando for 1 or 2 da false, mas em cima diz 1, 2, e 3 são números.
-	OP == 1, writeln('humano contra humano');
-	OP == 2, writeln('humano contra computador'), menu_nivel;
+	Op == 1, writeln('humano contra humano');
+	Op == 2, writeln('humano contra computador'), menu_nivel;
 	Op == 3, writeln('computador contra computador'), menu_nivel.
 
 
