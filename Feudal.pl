@@ -71,13 +71,13 @@ estadoInicial([[x,0,0,0,0,0,0,0,0,x,x,0,0,0,0,0,0,0,0,0,0,0,0,x],
                [x,0,0,0,0,t,x,0,0,0,0,0,0,0,0,0,0,x,x,0,0,0,0,x]]).
 
 
-show:-estadoTeste(X), print_tab(X).
+show:- estadoInicial(X), print_tab(X).
+show2:-estadoTeste(X), print_tab(X).
 
 print_tab(Tab):- writeln('    A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X '),
 		 printLists(Tab,1),
 		 writeln('    A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X '),nl.
 
-%lim:- writeln('   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+').
 lim:- writeln('   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+').
 
 
@@ -131,6 +131,7 @@ draw_casa(Elem):-  %desenha a casa com os valores respectivmente
 start:-
 	welcome, show,
 	menu_start.
+
 
 welcome:-
 	writeln('**********************************'),
@@ -190,11 +191,13 @@ menu_nivel:-
 	write(Op), integer(Op),writeln(' um numero').
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%% estado para testar visualização do tabuleiro %%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%%para efeito de teste da visulização do tabuleiro com todas as peças
+%%colocadas no tabuleiro.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%% estado para testar tabuleiro %%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 estadoTeste([[x,0,0,0,0,0,0,0,0,x,x,0,0,0,0,0,0,0,0,0,0,0,0,x],
 	     [0,0,0,0,0,0,0,0,0,0,0,0,0,x,x,0,0,0,0,0,0,0,0,0],
              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
