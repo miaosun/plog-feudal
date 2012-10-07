@@ -86,7 +86,7 @@ printList([FElem|OElem]):-
 
 start:-
 	welcome, show,
-	menu_start, menu_nivel.
+	menu_start.
 
 welcome:-
 	writeln('**********************************'),
@@ -94,7 +94,6 @@ welcome:-
 	writeln('*      Bemvindo ao Feudal        *'),
 	writeln('*                                *'),
 	writeln('**********************************'),nl.
-
 
 menu_start:-
 	writeln('**********************************'),
@@ -108,7 +107,14 @@ menu_start:-
         writeln('**********************************'),nl,
 	write('faca a sua escolha: '), faz_opcao(Op),
 	%tipo_jogo(Op, J1, J2),
-	write(Op), integer(Op),writeln(' um numero'), !.
+	write(Op), integer(Op),writeln(' um numero'),
+	comeca_jogo(Op).
+
+comeca_jogo(Op):-    %nao sei porque só da true quando Op for 3, quando for 1 or 2 da false, mas em cima diz 1, 2, e 3 são números.
+	OP == 1, writeln('humano contra humano');
+	OP == 2, writeln('humano contra computador'), menu_nivel;
+	Op == 3, writeln('computador contra computador'), menu_nivel.
+
 
 /*
 tipo_jogo(1,humano,humano).
@@ -120,6 +126,7 @@ opcao_invalida(Op):-
 	Op \== 1,
 	Op \== 2,
 	Op \== 3.
+
 
 faz_opcao(Op):-
 	read(Op),
@@ -138,4 +145,4 @@ menu_nivel:-
         writeln('*                                *'),
         writeln('**********************************'),nl,
 	write('faca a sua escolha: '), faz_opcao(Op),
-	write(Op), integer(Op),writeln(' um numero'), !.
+	write(Op), integer(Op),writeln(' um numero').
