@@ -55,11 +55,12 @@ estadoInicial([[x,0,0,0,0,0,0,0,0,x,x,0,0,0,0,0,0,0,0,0,0,0,0,x],
 
 show:-estadoInicial(X), print_tab(X).
 
-print_tab(Tab):- writeln('     A   B   C   D   E   F   G   H   I   J   K   L   M   N   O   P   Q   R   S   T   U   V   W   X  '),
+print_tab(Tab):- writeln('    A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X '),
 		 printLists(Tab,1),
-		 writeln('     A   B   C   D   E   F   G   H   I   J   K   L   M   N   O   P   Q   R   S   T   U   V   W   X  '),nl.
+		 writeln('    A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X '),nl.
 
-lim:- writeln('   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+').
+%lim:- writeln('   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+').
+lim:- writeln('   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+').
 
 
 %%imprime a lista inteira
@@ -80,13 +81,13 @@ printLists([FList|OList],N):-
 %imprime todos os elementos de cada sublista
 printList([]).
 printList([FElem|OElem]):-
-                        write(' '), draw_casa(FElem), write(' |'),
+                        write(''), draw_casa(FElem), write('|'),
                         printList(OElem).
 
 draw_casa(Elem):-  %desenha a casa com os valores respectivmente
-	Elem == 0, write(' ');
-	Elem == x, write('X');
-	Elem == t, write('T').
+	Elem == 0, write('  ');
+	Elem == x, write('XX');
+	Elem == t, write('TT').
 
 
 start:-
@@ -128,9 +129,7 @@ tipo_jogo(3,computador,computador).
 */
 
 opcao_invalida(Op):-
-	Op \== 1,
-	Op \== 2,
-	Op \== 3.
+	Op \== 1, Op \== 2, Op \== 3.
 
 
 faz_opcao(Op):-
