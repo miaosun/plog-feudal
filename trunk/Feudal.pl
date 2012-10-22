@@ -78,12 +78,12 @@ show:- estadoInicial(X), print_tab(X).  %mostra tabuleiro do estado inicial
 show2:-estadoTeste(X), print_tab(X).	%mostra tabuleiro do estado teste com todas as peças colocadas no tabuleiro
 
 %mostra o tabuleiro e as coordenadas respectivemente
-print_tab(Tab):- writeln('    A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X '),
+print_tab(Tab):- write('    A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X '),nl,
 		 printLists(Tab,1),
-		 writeln('    A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X '),nl.
+		 write('    A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X '),nl,nl.
 
 %desenhar o limite do tabuleiro
-lim:- writeln('   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+').
+lim:- write('   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+'),nl.
 
 
 %%imprime a lista inteira
@@ -92,12 +92,12 @@ printLists([FList|OList],N):-
                         lim,
 		        N < 10, write(' '), write(N), write(' |'),
 			printList(FList),
-			N2 is N+1, write(' '), writeln(N),
+			N2 is N+1, write(' '), write(N),nl,
                         printLists(OList,N2),!;
 
 			N> 9, write(N), write(' |'),
                         printList(FList),
-			N2 is N+1, write(' '), writeln(N),
+			N2 is N+1, write(' '), write(N),nl,
                         printLists(OList,N2).
 
 
@@ -139,42 +139,42 @@ start:-
 
 
 welcome:-
-	writeln('**********************************'),
-	writeln('*                                *'),
-	writeln('*      Bemvindo ao Feudal        *'),
-	writeln('*                                *'),
-	writeln('**********************************'),nl.
+	write('**********************************'),nl,
+	write('*                                *'),nl,
+	write('*      Bemvindo ao Feudal        *'),nl,
+	write('*                                *'),nl,
+	write('**********************************'),nl,nl.
 
 menu_start:-
-	writeln('**********************************'),
-        writeln('*                                *'),
-        writeln('*     Escolhe o mode do jogo:    *'),
-        writeln('*                                *'),
-        writeln('*       1.Humano VS Humano       *'),
-        writeln('*     2.Humano VS Computador     *'),
-        writeln('*   3.Computador VS Computador   *'),
-        writeln('*                                *'),
-        writeln('**********************************'),nl,
+	write('**********************************'),nl,
+        write('*                                *'),nl,
+        write('*     Escolhe o mode do jogo:    *'),nl,
+        write('*                                *'),nl,
+        write('*       1.Humano VS Humano       *'),nl,
+        write('*     2.Humano VS Computador     *'),nl,
+        write('*   3.Computador VS Computador   *'),nl,
+        write('*                                *'),nl,
+        write('**********************************'),nl,nl,
 	write('faca a sua escolha: '), faz_opcao(Op),
-	%tipo_jogo(Op, J1, J2),
-	write(Op), integer(Op),writeln(' um numero'),
-	comeca_jogo(Op).
+	tipo_jogo(Op, _J1, _J2).
+	%comeca_jogo(Op).
 
-comeca_jogo(Op):-    %para efeito de teste, ainda não está implementado
+/*comeca_jogo(Op):-    %para efeito de teste, ainda não está implementado
 	Op == 1, writeln('humano contra humano');
 	Op == 2, writeln('humano contra computador'), menu_nivel;
 	Op == 3, writeln('computador contra computador'), menu_nivel.
+*/
 
 /*
-insere_peca(J,Peca,X,Y,Tab,Tab2).
+insere_peca(J,Peca,X,Y,Tab,Tab2)
 remove_peca(J,Peca,X,Y,Tab,Tab2).
 */
 
-/*
-tipo_jogo(1,humano,humano).
-tipo_jogo(2,humano,computador).
-tipo_jogo(3,computador,computador).
-*/
+
+tipo_jogo(1,humano,humano):- write('\nMode: Humano contra Humano\n'),nl.
+tipo_jogo(2,humano,computador):- write('\nMode: Humano contra Computador\n'),nl, menu_nivel.
+tipo_jogo(3,computador,computador):- write('\nMode: Computador contra Computador\n'),nl, menu_nivel.
+
 
 %funcao auxiliar para verificar se a opção do utilizador é valido
 opcao_invalida(Op):-
@@ -183,22 +183,22 @@ opcao_invalida(Op):-
 %procede a opção do utilizador
 faz_opcao(Op):-
 	read(Op),
-	not(opcao_invalida(Op)),!;
+	\+opcao_invalida(Op),!;
 	writeln('opcao invalida'), write('faca a sua escolha: '), faz_opcao(Op).
 
 
 menu_nivel:-
-	writeln('**********************************'),
-        writeln('*                                *'),
-        writeln('*         Nivel do Jogo          *'),
-        writeln('*                                *'),
-        writeln('*            1.Easy              *'),
-        writeln('*           2.Normal             *'),
-        writeln('*            3.Hard              *'),
-        writeln('*                                *'),
-        writeln('**********************************'),nl,
-	write('faca a sua escolha: '), faz_opcao(Op),
-	write(Op), integer(Op),writeln(' um numero').
+	write('**********************************'),nl,
+        write('*                                *'),nl,
+        write('*         Nivel do Jogo          *'),nl,
+        write('*                                *'),nl,
+        write('*            1.Easy              *'),nl,
+        write('*           2.Normal             *'),nl,
+        write('*            3.Hard              *'),nl,
+        write('*                                *'),nl,
+        write('**********************************'),nl,nl,
+	write('faca a sua escolha: '), faz_opcao(_Op).
+	%write(Op), integer(Op),writeln(' um numero').
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
