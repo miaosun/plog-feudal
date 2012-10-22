@@ -5,7 +5,7 @@
 %%%%%%%%%%%%%%%%%    PLOG  MIEIC 2012/2013    %%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-:-use_module(library(lists)).
+%:-use_module(library(lists)).
 
 % x - Mountains
 % t - rough terrain
@@ -39,8 +39,8 @@
 
 mountedmen([aP,aD,ak, bP,bD,bk]).
 footmen([aK,aS,as,aa,ap, bK,bS,bs,ba,bp]).
-peca_J1([aC,aG,aK,aP,aD, ak,ak,aS,aS,as,aa,ap,ap,ap,ap]).
-peca_J2([bC,bG,bK,bP,bD, bk,bk,bS,bS,bs,ba,bp,bp,bp,bp]).
+pecas_J1([aC,aG,aK,aP,aD, ak,ak,aS,aS,as,aa,ap,ap,ap,ap]).
+pecas_J2([bC,bG,bK,bP,bD, bk,bk,bS,bS,bs,ba,bp,bp,bp,bp]).
 
 
 jogador(j1,1).
@@ -134,7 +134,7 @@ draw_casa(Elem):-  %desenha a casa com os valores respectivmente
 
 
 start:-
-	welcome, show,
+	welcome, %show,
 	menu_start.
 
 
@@ -155,25 +155,56 @@ menu_start:-
         write('*   3.Computador VS Computador   *'),nl,
         write('*                                *'),nl,
         write('**********************************'),nl,nl,
-	write('faca a sua escolha: '), faz_opcao(Op),
-	tipo_jogo(Op, _J1, _J2).
-	%comeca_jogo(Op).
+	write('Opcao: '), faz_opcao(Op),
+	%tipo_jogo(Op, _J1, _J2).
+	comeca_jogo(Op).
 
-/*comeca_jogo(Op):-    %para efeito de teste, ainda não está implementado
-	Op == 1, writeln('humano contra humano');
-	Op == 2, writeln('humano contra computador'), menu_nivel;
-	Op == 3, writeln('computador contra computador'), menu_nivel.
-*/
+comeca_jogo(Op):-    %para efeito de teste, ainda não está implementado
+	Op == 1, write('\nMode: Humano contra Humano\n'),nl, estadoInicial(Tab), /*insere_Peca(J,Peca,X,Y,Tab,Tab2),*/ jogador_jogador(Tab,j1),!;
+	Op == 2, write('\nMode: Humano contra Computador\n'),nl, menu_nivel;
+	Op == 3, write('\nMode: Computador contra Computador\n'),nl, menu_nivel.
+
 
 /*
-insere_peca(J,Peca,X,Y,Tab,Tab2)
+insere_peca(J,Peca,X,Y,Tab,Tab2):-
+	nl,write('Jogador '), jogador(J,NJ),write(NJ),
+	NJ == 1, write(' insere todas as suas pecas no seu reino (posH: A-W, posV: 1-12)'),nl,nl,
+	repeat, (write('Peca: '), read(Peca), peca_valida(NJ,Peca)),
+	repeat, (write('posH: '), read(H), posH_valida(NJ,H)),
+	repeat, (write('posV: '), read(V), posV_valida(NJ,V));
+
+	NJ == 2, write(' insere todas as suas pecas no seu reino (posH: A-W, posV: 13-24)'),nl,nl,!.
+
+
+
+peca_valida(NJ,Peca):-
+	NJ == 1, member(Peca, pecas_J1),!;
+	NJ == 2, member(Peca, pecas_J2).
+
+posH_valida(_,H):-
+	H>="A", H=<"W",!;
+	H>="a", H=<"w".
+
+posV_valida(NJ,V):-
+	NJ == 1, V>0, V<13,!;
+	NJ == 2, V>12, V<25.
+
 remove_peca(J,Peca,X,Y,Tab,Tab2).
 */
 
-
-tipo_jogo(1,humano,humano):- write('\nMode: Humano contra Humano\n'),nl.
+/*
+tipo_jogo(1,humano,humano):- write('\nMode: Humano contra Humano\n'),nl, estadoInicial(Tab), jogador_jogador(Tab,j1).
 tipo_jogo(2,humano,computador):- write('\nMode: Humano contra Computador\n'),nl, menu_nivel.
 tipo_jogo(3,computador,computador):- write('\nMode: Computador contra Computador\n'),nl, menu_nivel.
+*/
+
+jogador_jogador(Tab, ActJ):-
+	vez_jogador(Tab,ActJ),nl,nl .
+
+
+vez_jogador(Tab,J):-
+	nl,print_tab(Tab),!,nl,nl,write('Vez do Jagador: '), jogador(J, NJ), write(NJ).
+
 
 
 %funcao auxiliar para verificar se a opção do utilizador é valido
@@ -197,8 +228,50 @@ menu_nivel:-
         write('*            3.Hard              *'),nl,
         write('*                                *'),nl,
         write('**********************************'),nl,nl,
-	write('faca a sua escolha: '), faz_opcao(_Op).
+	write('Opcao: '), faz_opcao(_Op).
 	%write(Op), integer(Op),writeln(' um numero').
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
