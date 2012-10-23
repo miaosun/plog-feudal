@@ -39,8 +39,8 @@
 
 mountedmen([aP,aD,ak, bP,bD,bk]).
 footmen([aK,aS,as,aa,ap, bK,bS,bs,ba,bp]).
-pecas_J1([aC,aG,aK,aP,aD, ak,ak,aS,aS,as,aa,ap,ap,ap,ap]).
-pecas_J2([bC,bG,bK,bP,bD, bk,bk,bS,bS,bs,ba,bp,bp,bp,bp]).
+hand_J1([aC,aG,aK,aP,aD, ak,ak,aS,aS,as,aa,ap,ap,ap,ap]).
+hand_J2([bC,bG,bK,bP,bD, bk,bk,bS,bS,bs,ba,bp,bp,bp,bp]).
 
 
 jogador(j1,1).
@@ -78,9 +78,11 @@ show:- estadoInicial(X), print_tab(X).  %mostra tabuleiro do estado inicial
 show2:-estadoTeste(X), print_tab(X).	%mostra tabuleiro do estado teste com todas as peças colocadas no tabuleiro
 
 %mostra o tabuleiro e as coordenadas respectivemente
-print_tab(Tab):- write('    A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X '),nl,
+print_tab(Tab):- %write('    A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X '),nl,
+	         write('    1  2  3  4  5  6  7  8  9  10 11 12	13 14 15 16 17 18 19 20 21 22 23 24'),nl,
 		 printLists(Tab,1),
-		 write('    A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X '),nl,nl.
+		 write('    1  2  3  4  5  6  7  8  9  10 11 12	13 14 15 16 17 18 19 20 21 22 23 24'),nl,nl.
+		%write('    A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X '),nl,nl.
 
 %desenhar o limite do tabuleiro
 lim:- write('   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+'),nl.
@@ -106,6 +108,7 @@ printList([]).
 printList([FElem|OElem]):-
                         write(''), draw_casa(FElem), write('|'),
                         printList(OElem).
+
 
 draw_casa(Elem):-  %desenha a casa com os valores respectivmente
 	Elem == 0,  write('  ');
@@ -134,63 +137,90 @@ draw_casa(Elem):-  %desenha a casa com os valores respectivmente
 
 
 start:-
-	welcome, %show,
+	welcome,
 	menu_start.
 
+clear(0):-!.
+clear(N):- N1 is N-1, nl, !,clear(N1).
+
+print_legenda:-
+	write('Legenda:'),nl,
+	tab(3),write('C - Castle,   G - Green,	    K - King,    P - Prince,  D - Duke'),nl,
+	tab(3),write('k - Knights,  S - Sergeants,  s - Squire,  a - Archer,  p - Pikemen'), nl,nl.
 
 welcome:-
-	write('**********************************'),nl,
-	write('*                                *'),nl,
-	write('*      Bemvindo ao Feudal        *'),nl,
-	write('*                                *'),nl,
-	write('**********************************'),nl,nl.
+	write('**************************************'),nl,
+	write('*                                    *'),nl,
+	write('*        Bemvindo ao Feudal          *'),nl,
+	write('*                                    *'),nl,
+	write('**************************************'),nl,nl.
 
 menu_start:-
-	write('**********************************'),nl,
-        write('*                                *'),nl,
-        write('*     Escolhe o mode do jogo:    *'),nl,
-        write('*                                *'),nl,
-        write('*       1.Humano VS Humano       *'),nl,
-        write('*     2.Humano VS Computador     *'),nl,
-        write('*   3.Computador VS Computador   *'),nl,
-        write('*                                *'),nl,
-        write('**********************************'),nl,nl,
+	write('**************************************'),nl,
+        write('*                                    *'),nl,
+        write('*       Escolhe o mode do jogo:      *'),nl,
+        write('*                                    *'),nl,
+        write('*         1.Humano VS Humano         *'),nl,
+        write('*       2.Humano VS Computador       *'),nl,
+        write('*     3.Computador VS Computador     *'),nl,
+        write('*                                    *'),nl,
+        write('**************************************'),nl,nl,
 	write('Opcao: '), faz_opcao(Op),
 	%tipo_jogo(Op, _J1, _J2).
 	comeca_jogo(Op).
 
 comeca_jogo(Op):-    %para efeito de teste, ainda não está implementado
-	Op == 1, write('\nMode: Humano contra Humano\n'),nl, estadoInicial(Tab), /*insere_Peca(J,Peca,X,Y,Tab,Tab2),*/ jogador_jogador(Tab,j1),!;
-	Op == 2, write('\nMode: Humano contra Computador\n'),nl, menu_nivel;
+	Op == 1, clear(50),write('\nMode: Humano contra Humano\n'),nl, estadoInicial(Tab),
+	insere_peca(Tab), %insere_Peca(j1,_,_,_,Tab,Tab2),
+	jogador_jogador(Tab,j1),!;
+	Op == 2, write('\nMode: Humano contra Computador\n'),nl, menu_nivel,!;
 	Op == 3, write('\nMode: Computador contra Computador\n'),nl, menu_nivel.
 
 
-/*
-insere_peca(J,Peca,X,Y,Tab,Tab2):-
-	nl,write('Jogador '), jogador(J,NJ),write(NJ),
-	NJ == 1, write(' insere todas as suas pecas no seu reino (posH: A-W, posV: 1-12)'),nl,nl,
-	repeat, (write('Peca: '), read(Peca), peca_valida(NJ,Peca)),
-	repeat, (write('posH: '), read(H), posH_valida(NJ,H)),
-	repeat, (write('posV: '), read(V), posV_valida(NJ,V));
+%funcao só serve no inicio do jogo,inserir todas as pecas no tabuleiro
+insere_peca(Tab):-%, Tab, Tab2):-
 
-	NJ == 2, write(' insere todas as suas pecas no seu reino (posH: A-W, posV: 13-24)'),nl,nl,!.
+        vez_jogador(Tab, j1),
+	tab(8),write(': insere todas as suas pecas no seu reino!'),nl,nl,
+	print_legenda,
 
+	hand_J1(Hand1), %hand_J2(Hand2),
+
+	write('Player 1 hand: '), printList(Hand1),nl,nl,
+	write('Escolhe uma peca:'),nl,
+	escolhe_peca_da_mao(Hand1,0),nl,
+	write('Peca: '), read(Peca), %peca_valida(Peca),
+
+
+	repeat, (write('posX: '), read(X), posH_valida(NJ,X)),
+	repeat, (write('posY: '), read(Y), posV_valida(NJ,Y)),
+
+	write(' insere todas as suas pecas no seu reino (posH: A-W, posV: 13-24)'),nl,nl,!.
+
+
+escolhe_peca_da_mao([],_).
+escolhe_peca_da_mao([H|T],N):-
+	N1 is N+1,
+	write(N),
+	write(': '),
+	draw_casa(H),
+	write(' | '),
+	escolhe_peca_da_mao(T,N1),!.
 
 
 peca_valida(NJ,Peca):-
 	NJ == 1, member(Peca, pecas_J1),!;
 	NJ == 2, member(Peca, pecas_J2).
 
-posH_valida(_,H):-
-	H>="A", H=<"W",!;
-	H>="a", H=<"w".
+posH_valida(_,X):-
+	X>=1, X=<24,!.
 
-posV_valida(NJ,V):-
-	NJ == 1, V>0, V<13,!;
-	NJ == 2, V>12, V<25.
+posV_valida(NJ,Y):-
+	NJ == 1, Y>=1, Y=<12,!;
+	NJ == 2, Y>=13, Y=<24.
 
 remove_peca(J,Peca,X,Y,Tab,Tab2).
-*/
+
 
 /*
 tipo_jogo(1,humano,humano):- write('\nMode: Humano contra Humano\n'),nl, estadoInicial(Tab), jogador_jogador(Tab,j1).
@@ -203,7 +233,7 @@ jogador_jogador(Tab, ActJ):-
 
 
 vez_jogador(Tab,J):-
-	nl,print_tab(Tab),!,nl,nl,write('Vez do Jagador: '), jogador(J, NJ), write(NJ).
+	print_tab(Tab),!,nl,write('Vez do Jagador: '), jogador(J, NJ), write(NJ),nl.
 
 
 
@@ -215,7 +245,7 @@ opcao_invalida(Op):-
 faz_opcao(Op):-
 	read(Op),
 	\+opcao_invalida(Op),!;
-	writeln('opcao invalida'), write('faca a sua escolha: '), faz_opcao(Op).
+	writeln('opcao invalida, tenta novamente'), write('Opcao: '), faz_opcao(Op),!.
 
 
 menu_nivel:-
@@ -228,7 +258,7 @@ menu_nivel:-
         write('*            3.Hard              *'),nl,
         write('*                                *'),nl,
         write('**********************************'),nl,nl,
-	write('Opcao: '), faz_opcao(_Op).
+	write('Opcao: '), faz_opcao(_Op),!.
 	%write(Op), integer(Op),writeln(' um numero').
 
 
