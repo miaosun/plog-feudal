@@ -37,6 +37,7 @@
 % bp - Pikemen   x4
 
 
+
 mountedmen([aP,aD,ak, bP,bD,bk]).
 footmen([aK,aS,as,aa,ap, bK,bS,bs,ba,bp]).
 hand_J1([aC,aG,aK,aP,aD, ak,ak,aS,aS,as,aa,ap,ap,ap,ap]).
@@ -171,44 +172,39 @@ menu_start:-
 
 comeca_jogo(Op):-    %para efeito de teste, ainda não est?implementado
 	Op == 1, clear(50),write('\nMode: Humano contra Humano\n'),nl, estadoInicial(Tab),
-	insere_peca(j1,_,Tab,Tab1),!, insere_peca(j2,_,Tab1,Tab2),%insere_Peca(j1,_,_,_,Tab,Tab2),
+	hand_J1(Hand1), hand_J2(Hand2),
+	insere_peca(j1,Hand1,Tab,Tab1),!, insere_peca(j2,Hand2,Tab1,Tab2),%insere_Peca(j1,_,_,_,Tab,Tab2),
 	jogador_jogador(Tab2,j1),!;
 	Op == 2, write('\nMode: Humano contra Computador\n'),nl, menu_nivel,!;
 	Op == 3, write('\nMode: Computador contra Computador\n'),nl, menu_nivel.
 
 
 %funcao so serve no inicio do jogo,inserir todas as pecas no tabuleiro
-insere_peca(J,Hand,Tab,Tab1):-
+insere_peca(_,[],_,_):-!.
+insere_peca(J,Hand,Tab,Tabf):-
 
         vez_jogador(Tab, J),
 	tab(8),write(': insere todas as suas pecas no seu reino!'),nl,nl,
 	print_legenda,
 
-	(   J == j1 -> hand_J1(Hand);
-	    J == j2 -> hand_J2(Hand)
-	),
 	length(Hand, HandSize),
+
 
 	write('Player '), write(J), write(' hand: '), printList(Hand),nl,nl,
 	write('Escolhe uma peca:'),nl,
-	escolhe_peca_da_mao(Hand,0),nl,
+	mostra_hand(Hand,1),nl,
 	write('Peca: '),
 	read(P),
-	(   (integer(P), P>=0, P<HandSize) ->
-	(   !, remove_at(Hand,P+1,Peca,Hand2));
+	(   (integer(P), P>0, P=<HandSize) ->
+	(   !, remove_at(Hand,P,Peca,Hand2));
 	(   write('Opcao invalida, tenta novamente!'),
-	    nl,nl,sleep(2),insere_peca(J,Hand,Tab,Tab1))),nl,
+	    nl,nl,sleep(1),insere_peca(J,Hand,Tab,Tab1))),nl,
 
 	%insere_peca_no_tab(J,Peca,Tab,Tab1),
 	repeat, (write('Linha: '), read(Ln), linha_valida(J,Ln)),
 	repeat, (write('Coluna: '), read(Cn), coluna_valida(J,Cn)),
 
-	insere_peca_no_tab(Peca,Ln,Cn,Tab,Tab1), insere_peca(J,Hand2,Tab1,_),
-
-
-
-
-	write(' funciona?'),nl,nl,!.
+	insere_peca_no_tab(Peca,Ln,Cn,Tab,Tab1), insere_peca(J,Hand2,Tab1,Tabf).
 
 
 /*
@@ -218,14 +214,15 @@ insere_peca_no_tab(J,Peca,Tab,Tab1):-
 	write('repeat funciona xD'),nl.
 */
 
+%insere peca no tabuleiro na determinada posicao
 insere_peca_no_tab(Peca,1,Cn,[H|T],[H2|T]):-
 	procede_colocacao(Peca,Cn,H,H2),!.
 
 insere_peca_no_tab(Peca,Ln,Cn,[H|T],[H|T2]):-
 	Ln2 is Ln-1,
-	insere_peca_on_tab(Peca,Ln2,Cn,T,T2).
+	insere_peca_no_tab(Peca,Ln2,Cn,T,T2).
 
-
+%funcao auxiliar
 procede_colocacao(Peca,1,[_|T],[Peca|T]):-!.
 procede_colocacao(Peca,N,[H|T],[H|T2]):-
 	N1 is N-1,
@@ -233,21 +230,14 @@ procede_colocacao(Peca,N,[H|T],[H|T2]):-
 
 
 
-nth([H|_],1,H):-!.
-nth([_|T],N,X):-
-	N1 is N-1, nth(T,N1,X).
-
-
-
-
-escolhe_peca_da_mao([],_).
-escolhe_peca_da_mao([H|T],N):-
+mostra_hand([],_):-!.
+mostra_hand([H|T],N):-
 	N1 is N+1,
 	write(N),
 	write(': '),
 	draw_casa(H),
 	write(' | '),
-	escolhe_peca_da_mao(T,N1),!.
+	mostra_hand(T,N1),!.
 
 
 tira_peca_da_mao(_,[],[]).
