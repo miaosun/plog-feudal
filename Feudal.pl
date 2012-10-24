@@ -173,7 +173,7 @@ menu_start:-
 comeca_jogo(Op):-    %para efeito de teste, ainda não est?implementado
 	Op == 1, clear(50),write('\nMode: Humano contra Humano\n'),nl, estadoInicial(Tab),
 	hand_J1(Hand1), hand_J2(Hand2),
-	insere_peca(j1,Hand1,Tab,Tab1),!, insere_peca(j2,Hand2,Tab1,Tab2),%insere_Peca(j1,_,_,_,Tab,Tab2),
+	insere_peca(j1,Hand1,Tab,Tab1),!, insere_peca(j2,Hand2,Tab1,Tab2),
 	jogador_jogador(Tab2,j1),!;
 	Op == 2, write('\nMode: Humano contra Computador\n'),nl, menu_nivel,!;
 	Op == 3, write('\nMode: Computador contra Computador\n'),nl, menu_nivel.
@@ -189,7 +189,6 @@ insere_peca(J,Hand,Tab,Tabf):-
 
 	length(Hand, HandSize),
 
-
 	write('Player '), write(J), write(' hand: '), printList(Hand),nl,nl,
 	write('Escolhe uma peca:'),nl,
 	mostra_hand(Hand,1),nl,
@@ -200,19 +199,11 @@ insere_peca(J,Hand,Tab,Tabf):-
 	(   write('Opcao invalida, tenta novamente!'),
 	    nl,nl,sleep(1),insere_peca(J,Hand,Tab,Tab1))),nl,
 
-	%insere_peca_no_tab(J,Peca,Tab,Tab1),
 	repeat, (write('Linha: '), read(Ln), linha_valida(J,Ln)),
 	repeat, (write('Coluna: '), read(Cn), coluna_valida(J,Cn)),
 
 	insere_peca_no_tab(Peca,Ln,Cn,Tab,Tab1), insere_peca(J,Hand2,Tab1,Tabf).
 
-
-/*
-insere_peca_no_tab(J,Peca,Tab,Tab1):-
-	repeat, (write('Linha: '), read(Ln), linha_valida(J,Ln)),
-	repeat, (write('Coluna: '), read(Cn), coluna_valida(J,Cn)),
-	write('repeat funciona xD'),nl.
-*/
 
 %insere peca no tabuleiro na determinada posicao
 insere_peca_no_tab(Peca,1,Cn,[H|T],[H2|T]):-
