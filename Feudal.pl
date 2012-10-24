@@ -169,33 +169,75 @@ menu_start:-
 	%tipo_jogo(Op, _J1, _J2).
 	comeca_jogo(Op).
 
-comeca_jogo(Op):-    %para efeito de teste, ainda não está implementado
+comeca_jogo(Op):-    %para efeito de teste, ainda não est?implementado
 	Op == 1, clear(50),write('\nMode: Humano contra Humano\n'),nl, estadoInicial(Tab),
-	insere_peca(Tab), %insere_Peca(j1,_,_,_,Tab,Tab2),
-	jogador_jogador(Tab,j1),!;
+	insere_peca(j1,_,Tab,Tab1),!, insere_peca(j2,_,Tab1,Tab2),%insere_Peca(j1,_,_,_,Tab,Tab2),
+	jogador_jogador(Tab2,j1),!;
 	Op == 2, write('\nMode: Humano contra Computador\n'),nl, menu_nivel,!;
 	Op == 3, write('\nMode: Computador contra Computador\n'),nl, menu_nivel.
 
 
-%funcao só serve no inicio do jogo,inserir todas as pecas no tabuleiro
-insere_peca(Tab):-%, Tab, Tab2):-
+%funcao so serve no inicio do jogo,inserir todas as pecas no tabuleiro
+insere_peca(J,Hand,Tab,Tab1):-
 
-        vez_jogador(Tab, j1),
+        vez_jogador(Tab, J),
 	tab(8),write(': insere todas as suas pecas no seu reino!'),nl,nl,
 	print_legenda,
 
-	hand_J1(Hand1), %hand_J2(Hand2),
+	(   J == j1 -> hand_J1(Hand);
+	    J == j2 -> hand_J2(Hand)
+	),
+	length(Hand, HandSize),
 
-	write('Player 1 hand: '), printList(Hand1),nl,nl,
+	write('Player '), write(J), write(' hand: '), printList(Hand),nl,nl,
 	write('Escolhe uma peca:'),nl,
-	escolhe_peca_da_mao(Hand1,0),nl,
-	write('Peca: '), read(Peca), %peca_valida(Peca),
+	escolhe_peca_da_mao(Hand,0),nl,
+	write('Peca: '),
+	read(P),
+	(   (integer(P), P>=0, P<HandSize) ->
+	(   !, remove_at(Hand,P+1,Peca,Hand2));
+	(   write('Opcao invalida, tenta novamente!'),
+	    nl,nl,sleep(2),insere_peca(J,Hand,Tab,Tab1))),nl,
+
+	%insere_peca_no_tab(J,Peca,Tab,Tab1),
+	repeat, (write('Linha: '), read(Ln), linha_valida(J,Ln)),
+	repeat, (write('Coluna: '), read(Cn), coluna_valida(J,Cn)),
+
+	insere_peca_no_tab(Peca,Ln,Cn,Tab,Tab1), insere_peca(J,Hand2,Tab1,_),
 
 
-	repeat, (write('posX: '), read(X), posH_valida(NJ,X)),
-	repeat, (write('posY: '), read(Y), posV_valida(NJ,Y)),
 
-	write(' insere todas as suas pecas no seu reino (posH: A-W, posV: 13-24)'),nl,nl,!.
+
+	write(' funciona?'),nl,nl,!.
+
+
+/*
+insere_peca_no_tab(J,Peca,Tab,Tab1):-
+	repeat, (write('Linha: '), read(Ln), linha_valida(J,Ln)),
+	repeat, (write('Coluna: '), read(Cn), coluna_valida(J,Cn)),
+	write('repeat funciona xD'),nl.
+*/
+
+insere_peca_no_tab(Peca,1,Cn,[H|T],[H2|T]):-
+	procede_colocacao(Peca,Cn,H,H2),!.
+
+insere_peca_no_tab(Peca,Ln,Cn,[H|T],[H|T2]):-
+	Ln2 is Ln-1,
+	insere_peca_on_tab(Peca,Ln2,Cn,T,T2).
+
+
+procede_colocacao(Peca,1,[_|T],[Peca|T]):-!.
+procede_colocacao(Peca,N,[H|T],[H|T2]):-
+	N1 is N-1,
+	procede_colocacao(Peca,N1,T,T2).
+
+
+
+nth([H|_],1,H):-!.
+nth([_|T],N,X):-
+	N1 is N-1, nth(T,N1,X).
+
+
 
 
 escolhe_peca_da_mao([],_).
@@ -208,16 +250,29 @@ escolhe_peca_da_mao([H|T],N):-
 	escolhe_peca_da_mao(T,N1),!.
 
 
+tira_peca_da_mao(_,[],[]).
+tira_peca_da_mao(Peca,[Peca|T],T).
+tira_peca_da_mao(Peca,[H|T],[H|T2]):-
+	tira_peca_da_mao(Peca,T,T2).
+
+
+%remover a peca da lista com indice N, devolve a Peca e a lista final
+remove_at([Peca|Xs],1,Peca,Xs):-!.
+remove_at([Y|Xs],N,Peca,[Y|Ys]) :- N > 1,
+   N1 is N - 1, remove_at(Xs,N1,Peca,Ys).
+
+
+
 peca_valida(NJ,Peca):-
 	NJ == 1, member(Peca, pecas_J1),!;
 	NJ == 2, member(Peca, pecas_J2).
 
-posH_valida(_,X):-
-	X>=1, X=<24,!.
+coluna_valida(_,Cn):-
+	Cn>=1, Cn=<24,!.
 
-posV_valida(NJ,Y):-
-	NJ == 1, Y>=1, Y=<12,!;
-	NJ == 2, Y>=13, Y=<24.
+linha_valida(NJ,Ln):-
+	NJ == j1 -> Ln>=1,  Ln=<12;
+	NJ == j2 -> Ln>=13, Ln=<24.
 
 remove_peca(J,Peca,X,Y,Tab,Tab2).
 
@@ -237,7 +292,7 @@ vez_jogador(Tab,J):-
 
 
 
-%funcao auxiliar para verificar se a opção do utilizador é valido
+%funcao auxiliar para verificar se a opção do utilizador ?valido
 opcao_invalida(Op):-
 	Op \== 1, Op \== 2, Op \== 3.
 
