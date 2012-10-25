@@ -181,7 +181,7 @@ comeca_jogo(Op):-    %para efeito de teste, ainda não est?implementado
 
 %funcao so serve no inicio do jogo,inserir todas as pecas no tabuleiro
 insere_peca(_,[],_,_):-!.
-insere_peca(J,Hand,Tab,Tabf):-
+insere_peca(J,Hand,Tab,Tabf):-%%% como posso instanciar o Tabf com o valor final do Tab?????????????????????????????????????????????????????????
 
         vez_jogador(Tab, J),
 	tab(8),write(': insere todas as suas pecas no seu reino!'),nl,nl,
@@ -199,10 +199,36 @@ insere_peca(J,Hand,Tab,Tabf):-
 	(   write('Opcao invalida, tenta novamente!'),
 	    nl,nl,sleep(1),insere_peca(J,Hand,Tab,Tab1))),nl,
 
-	repeat, (write('Linha: '), read(Ln), linha_valida(J,Ln)),
-	repeat, (write('Coluna: '), read(Cn), coluna_valida(J,Cn)),
+	repeat, %Porque quando falhar colocacao_valida/5 volta ao repeat de 'Coluna', em vez de 'Linha'?????????????????????????????????????????????
+	(   (repeat, (write('Linha: '), read(Ln), linha_valida(J,Ln))),!,
+	    (repeat, (write('Coluna: '), read(Cn), coluna_valida(J,Cn))),
+	    colocacao_valida(J,Peca,Ln,Cn,Tab)
+	),
 
 	insere_peca_no_tab(Peca,Ln,Cn,Tab,Tab1), insere_peca(J,Hand2,Tab1,Tabf).
+
+
+colocacao_valida(J,Peca,Ln,Cn,Tab):-
+	nth(Tab,Ln,LElm),
+	nth(LElm,Cn,Casa),
+
+	(   J==j1,
+	    (Peca==aC; Peca==aG) -> true;
+	    (Peca\=aC, Peca\=aG, Casa==0) -> true
+	);
+
+	(   J==j2,
+	    (Peca==bC; Peca==bG) -> true;
+	    (Peca\=bC, Peca\=bG, Casa==0) -> true
+	);
+
+	write('Jogada nao valida, tenta novamente!'),nl,fail.
+
+
+
+nth([H|_],1,H):-!.
+nth([_|T],N,X):-
+	I is N-1, nth(T,I,X).
 
 
 %insere peca no tabuleiro na determinada posicao
@@ -210,8 +236,8 @@ insere_peca_no_tab(Peca,1,Cn,[H|T],[H2|T]):-
 	procede_colocacao(Peca,Cn,H,H2),!.
 
 insere_peca_no_tab(Peca,Ln,Cn,[H|T],[H|T2]):-
-	Ln2 is Ln-1,
-	insere_peca_no_tab(Peca,Ln2,Cn,T,T2).
+	Ln1 is Ln-1,
+	insere_peca_no_tab(Peca,Ln1,Cn,T,T2).
 
 %funcao auxiliar
 procede_colocacao(Peca,1,[_|T],[Peca|T]):-!.
@@ -243,19 +269,17 @@ remove_at([Y|Xs],N,Peca,[Y|Ys]) :- N > 1,
    N1 is N - 1, remove_at(Xs,N1,Peca,Ys).
 
 
-
-peca_valida(NJ,Peca):-
-	NJ == 1, member(Peca, pecas_J1),!;
-	NJ == 2, member(Peca, pecas_J2).
-
-coluna_valida(_,Cn):-
-	Cn>=1, Cn=<24,!.
+coluna_valida(_,Cn):- %??????????????????????????????????????????????????????????????
+	Cn>=1, Cn=<24,!;
+	write('Coluna invalida, tenta novamente!'),nl,fail.  %nao funciona, porque???
 
 linha_valida(NJ,Ln):-
 	NJ == j1 -> Ln>=1,  Ln=<12;
-	NJ == j2 -> Ln>=13, Ln=<24.
+	NJ == j2 -> Ln>=13, Ln=<24;
+	write('Linha invalida, tenta novamente!'),nl,fail.  %funciona
 
-remove_peca(J,Peca,X,Y,Tab,Tab2).
+
+%remove_peca(J,Peca,X,Y,Tab,Tab2).
 
 
 /*
