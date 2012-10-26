@@ -79,11 +79,10 @@ show:- estadoInicial(X), print_tab(X).  %mostra tabuleiro do estado inicial
 show2:-estadoTeste(X), print_tab(X).	%mostra tabuleiro do estado teste com todas as peças colocadas no tabuleiro
 
 %mostra o tabuleiro e as coordenadas respectivemente
-print_tab(Tab):- %write('    A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X '),nl,
+print_tab(Tab):-
 	         write('    1  2  3  4  5  6  7  8  9  10 11 12	13 14 15 16 17 18 19 20 21 22 23 24'),nl,
 		 printLists(Tab,1),
 		 write('    1  2  3  4  5  6  7  8  9  10 11 12	13 14 15 16 17 18 19 20 21 22 23 24'),nl,nl.
-		%write('    A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X '),nl,nl.
 
 %desenhar o limite do tabuleiro
 lim:- write('   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+'),nl.
@@ -91,8 +90,7 @@ lim:- write('   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
 
 %%imprime a lista inteira
 printLists([],_):-lim, !.
-printLists([FList|OList],N):-
-                        lim,
+printLists([FList|OList],N):- lim,
 		        N < 10, write(' '), write(N), write(' |'),
 			printList(FList),
 			N2 is N+1, write(' '), write(N),nl,
@@ -141,12 +139,14 @@ start:-
 	welcome,
 	menu_start.
 
+%limpa a ecra com N linhas
 clear(0):-!.
 clear(N):- N1 is N-1, nl, !,clear(N1).
 
+%para o utilizador saber que simbolo corresponde que peca
 print_legenda:-
 	write('Legenda:'),nl,
-	tab(3),write('C - Castle,   G - Green,	    K - King,    P - Prince,  D - Duke'),nl,
+	tab(3),write('C - Castle,   G - Green,	 K - King,    P - Prince,  D - Duke'),nl,
 	tab(3),write('k - Knights,  S - Sergeants,  s - Squire,  a - Archer,  p - Pikemen'), nl,nl.
 
 welcome:-
@@ -167,7 +167,6 @@ menu_start:-
         write('*                                    *'),nl,
         write('**************************************'),nl,nl,
 	write('Opcao: '), faz_opcao(Op),
-	%tipo_jogo(Op, _J1, _J2).
 	comeca_jogo(Op).
 
 comeca_jogo(Op):-    %para efeito de teste, ainda não est?implementado
@@ -180,7 +179,7 @@ comeca_jogo(Op):-    %para efeito de teste, ainda não est?implementado
 
 
 %funcao so serve no inicio do jogo,inserir todas as pecas no tabuleiro
-insere_peca(_,[],_,_):-!.
+insere_peca(_,[],Tab,Tab):-!.
 insere_peca(J,Hand,Tab,Tabf):-%%% como posso instanciar o Tabf com o valor final do Tab?????????????????????????????????????????????????????????
 
         vez_jogador(Tab, J),
@@ -199,9 +198,9 @@ insere_peca(J,Hand,Tab,Tabf):-%%% como posso instanciar o Tabf com o valor final
 	(   write('Opcao invalida, tenta novamente!'),
 	    nl,nl,sleep(1),insere_peca(J,Hand,Tab,Tab1))),nl,
 
-	repeat, %Porque quando falhar colocacao_valida/5 volta ao repeat de 'Coluna', em vez de 'Linha'?????????????????????????????????????????????
-	(   (repeat, (write('Linha: '), read(Ln), linha_valida(J,Ln))),!,
-	    (repeat, (write('Coluna: '), read(Cn), coluna_valida(J,Cn))),
+	repeat,
+	(   (repeat, (write('Linha: '), read(Ln), linha_valida(J,Ln))),
+	    (write('Coluna: '), read(Cn), coluna_valida(J,Cn)),
 	    colocacao_valida(J,Peca,Ln,Cn,Tab)
 	),
 
@@ -215,15 +214,14 @@ colocacao_valida(J,Peca,Ln,Cn,Tab):-
 	(   J==j1,
 	    (Peca==aC; Peca==aG) -> true;
 	    (Peca\=aC, Peca\=aG, Casa==0) -> true
-	);
+	),!;
 
 	(   J==j2,
 	    (Peca==bC; Peca==bG) -> true;
 	    (Peca\=bC, Peca\=bG, Casa==0) -> true
-	);
+	),!;
 
-	write('Jogada nao valida, tenta novamente!'),nl,fail.
-
+	write('Jogada nao valida, tenta novamente!'),!,nl,fail.
 
 
 nth([H|_],1,H):-!.
@@ -246,7 +244,7 @@ procede_colocacao(Peca,N,[H|T],[H|T2]):-
 	procede_colocacao(Peca,N1,T,T2).
 
 
-
+%mostra todas as pecas o jogador tem no momento
 mostra_hand([],_):-!.
 mostra_hand([H|T],N):-
 	N1 is N+1,
@@ -256,12 +254,12 @@ mostra_hand([H|T],N):-
 	write(' | '),
 	mostra_hand(T,N1),!.
 
-
+/*
 tira_peca_da_mao(_,[],[]).
 tira_peca_da_mao(Peca,[Peca|T],T).
 tira_peca_da_mao(Peca,[H|T],[H|T2]):-
 	tira_peca_da_mao(Peca,T,T2).
-
+*/
 
 %remover a peca da lista com indice N, devolve a Peca e a lista final
 remove_at([Peca|Xs],1,Peca,Xs):-!.
@@ -269,24 +267,19 @@ remove_at([Y|Xs],N,Peca,[Y|Ys]) :- N > 1,
    N1 is N - 1, remove_at(Xs,N1,Peca,Ys).
 
 
-coluna_valida(_,Cn):- %??????????????????????????????????????????????????????????????
+coluna_valida(_,Cn):-
 	Cn>=1, Cn=<24,!;
-	write('Coluna invalida, tenta novamente!'),nl,fail.  %nao funciona, porque???
+	write('Coluna invalida, tenta novamente!'),nl,fail.
 
 linha_valida(NJ,Ln):-
-	NJ == j1 -> Ln>=1,  Ln=<12;
-	NJ == j2 -> Ln>=13, Ln=<24;
+	(   NJ == j1, Ln>=1,  Ln=<12),!;
+	(   NJ == j2, Ln>=13, Ln=<24),!;
 	write('Linha invalida, tenta novamente!'),nl,fail.  %funciona
 
 
 %remove_peca(J,Peca,X,Y,Tab,Tab2).
 
 
-/*
-tipo_jogo(1,humano,humano):- write('\nMode: Humano contra Humano\n'),nl, estadoInicial(Tab), jogador_jogador(Tab,j1).
-tipo_jogo(2,humano,computador):- write('\nMode: Humano contra Computador\n'),nl, menu_nivel.
-tipo_jogo(3,computador,computador):- write('\nMode: Computador contra Computador\n'),nl, menu_nivel.
-*/
 
 jogador_jogador(Tab, ActJ):-
 	vez_jogador(Tab,ActJ),nl,nl .
@@ -295,13 +288,11 @@ jogador_jogador(Tab, ActJ):-
 vez_jogador(Tab,J):-
 	print_tab(Tab),!,nl,write('Vez do Jagador: '), jogador(J, NJ), write(NJ),nl.
 
-
-
-%funcao auxiliar para verificar se a opção do utilizador ?valido
+%funcao auxiliar para verificar se a opcao do utilizador e valida
 opcao_invalida(Op):-
 	Op \== 1, Op \== 2, Op \== 3.
 
-%procede a opção do utilizador
+%procede a opcao do utilizador
 faz_opcao(Op):-
 	read(Op),
 	\+opcao_invalida(Op),!;
@@ -320,9 +311,6 @@ menu_nivel:-
         write('**********************************'),nl,nl,
 	write('Opcao: '), faz_opcao(_Op),!.
 	%write(Op), integer(Op),writeln(' um numero').
-
-
-
 
 
 
