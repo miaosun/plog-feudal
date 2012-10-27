@@ -50,7 +50,7 @@ comeca_jogo(Op):-    %para efeito de teste, ainda não est?implementado
 	%funcionou até aqui, 2 jogadores inserir todas as sua pecas, falta determinar o Green so pode colocar ao lado do Castle.
 
 	estadoTeste(Tab2),
-	jogador_jogador(Tab2,j1),!;
+	jogador_jogador(j1,Tab2),!;
 
 	Op == 2, write('\nMode: Humano contra Computador\n'),nl, menu_nivel,!;
 	Op == 3, write('\nMode: Computador contra Computador\n'),nl, menu_nivel.
@@ -60,7 +60,7 @@ comeca_jogo(Op):-    %para efeito de teste, ainda não est?implementado
 %estado do tabuleiro no Tabf.
 insere_todas_peca(_,[],Tab,Tab):-!.
 insere_todas_peca(J,Hand,Tab,Tabf):-
-        vez_jogador(Tab, J),
+        vez_jogador(J,Tab),
 	tab(8),write(': insere todas as suas pecas no seu reino!'),nl,nl,
 	print_legenda,
 
@@ -182,37 +182,88 @@ coluna_valida(_,Cn):-
 	Cn>=1, Cn=<24,!;
 	write('Coluna invalida, tenta novamente!'),nl,fail.
 
-linha_valida(NJ,Ln):-
-	(   NJ == j1, Ln>=1,  Ln=<12),!;
-	(   NJ == j2, Ln>=13, Ln=<24),!;
+linha_valida(J,Ln):-
+	(   J == j1, Ln>=1,  Ln=<12),!;
+	(   J == j2, Ln>=13, Ln=<24),!;
 	write('Linha invalida, tenta novamente!'),nl,fail.
 
 
 
 
-jogador_jogador(Tab, J):-
-	vez_jogador(Tab,J),nl,
+jogador_jogador(J,Tab):-
+	vez_jogador(J,Tab),nl,
+	%(   game_over(Tab), write('Obrigado por jogar!'),nl);
+
 
 	print_legenda,
-	write('Escolhe a posicao da Peca pretende mover'),nl,
+	jogar(J,Tab).
+
+/*	write('Escolhe a posicao da Peca pretende mover'),nl,
         repeat,
 	(   (repeat, (write('Linha: '), read(Ln))),
-	    (write('Coluna: '), read(Cn), peca_do_jogador(J,Ln,Cn,Tab,_)
+	    (write('Coluna: '), read(Cn), permite_mover(J,Ln,Cn,Tab,Peca)
 
-	)),write(ok).
+	)),write(Peca),write(ok),
+
+        write('Escolhe a posicao do destino'),nl,
+        repeat,
+	(   (repeat, (write('Linha: '), read(Ln))),
+	    (write('Coluna: '), read(Cn), write(hello) %jogada_valida()
+
+	)),write(final).
+*/
 
 
-	%insere_peca_no_tab(Peca,Ln,Cn,Tab,Tab1), insere_todas_peca(J,Hand2,Tab1,Tabf).
+jogar(J,Tab):-
+	write('Escolhe a posicao da Peca pretende mover'),nl,
+        repeat,
+	(   (repeat, (write('Linha: '), read(Ln1))),
+	    (write('Coluna: '), read(Cn1), permite_mover(J,Ln1,Cn1,Tab,Peca),!
+
+	)),nl,nl,
+
+        write('Escolhe a posicao do destino'),nl,
+
+        write('Linha: '), read(Ln2),
+	write('Coluna: '), read(Cn2),
+
+	jogada_nao_valida(Peca,Ln1,Cn1,Ln2,Cn2,Tab),nl,
+	jogar(J,Tab).
+
+
+jogada_nao_valida(Peca,Ln1,Cn1,Ln2,Cn2,Tab):-
+	(   Ln1==Ln2, Cn1==Cn2) -> write('A posicao do destino e a mesma do origin, tenta novamente!'),nl,!;
+	write('funcina ate aqui.'),nl,fail.
 
 
 
-peca_do_jogador(J,Ln,Cn,Tab,Peca):-
+
+
+/*
+
+game_over(Tab):-
+	member(Linhas,Tab),
+	((   \+peca_esta_no_tab(aC,Tab),write(test1);
+	 (   \+peca_esta_no_tab(aK,Tab), \+peca_esta_no_tab(aP,Tab), \+peca_esta_no_tab(aD,Tab))
+	), write('Game over, o Jogador 2 ganhou')),nl,!;
+
+	member(Linhas,Tab),
+	((   \+peca_esta_no_tab(bC,Tab),write(test1);
+	 (   \+peca_esta_no_tab(bK,Tab), peca_esta_no_tab(bP,Tab), peca_esta_no_tab(bD,Tab))
+	), write('Game over, o Jogador 1 ganhou')),nl,!.
+*/
+%member(Linhas,Tab),member(Peca,Linhas) nao funciona!!
+
+
+
+
+permite_mover(J,Ln,Cn,Tab,Peca):-
 	pecas_J1(Pecas_J1),
 	pecas_J2(Pecas_J2),
 	get_peca_do_tab(J,Ln,Cn,Tab,Peca),
 	(   J==j1, Peca\=aC, Peca\=aG, member(Peca,Pecas_J1)),!;
 	(   J==j2, Peca\=bC, Peca\=bG, member(Peca,Pecas_J2)),!;
-	write('Peca nao e sua, tenta novamente!'),nl,fail.
+	write('Casa vazia ou nao se permite mover a peca!'),nl,fail.
 
 
 
@@ -220,7 +271,7 @@ peca_do_jogador(J,Ln,Cn,Tab,Peca):-
 
 
 
-vez_jogador(Tab,J):-
+vez_jogador(J,Tab):-
 	nl, print_tab(Tab),!,nl,write('Vez do Jagador: '), jogador(J, NJ), write(NJ),nl.
 
 %funcao auxiliar para verificar se a opcao do utilizador e valida
@@ -283,6 +334,18 @@ get_peca_do_tab(_,_,25,_,[]):-!.                %CnMais==25
 */
 
 
+peca_esta_no_tab(Peca,Tab):-
+	member(Peca,Sublista), member(Sublista,Tab),!;
+	fail.
+
+abc:-
+	estadoTeste2(Tabu),
+
+	peca_esta_no_tab(hi,Tabu),!,write(Tabu),!;
+	write(falhou).
+
+
+
 
 lista([1,2,3,4,5]).
 test:-
@@ -298,10 +361,6 @@ vez(N,Lis):-
 	),!,
 	write(Lis2),nl,write(N1),nl,
 	vez(N1,Lis2).
-
-
-
-
 
 
 
