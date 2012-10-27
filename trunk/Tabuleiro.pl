@@ -32,8 +32,8 @@
 
 mountedmen([aP,aD,ak, bP,bD,bk]).
 footmen([aK,aS,as,aa,ap, bK,bS,bs,ba,bp]).
-hand_J1([aC,aG,aK,aP,aD, ak,ak,aS,aS,as,aa,ap,ap,ap,ap]).
-hand_J2([bC,bG,bK,bP,bD, bk,bk,bS,bS,bs,ba,bp,bp,bp,bp]).
+pecas_J1([aC,aG,aK,aP,aD, ak,ak,aS,aS,as,aa,ap,ap,ap,ap]).
+pecas_J2([bC,bG,bK,bP,bD, bk,bk,bS,bS,bs,ba,bp,bp,bp,bp]).
 
 
 jogador(j1,1).
