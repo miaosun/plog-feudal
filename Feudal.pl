@@ -45,11 +45,11 @@ menu_start:-
 
 comeca_jogo(Op):-    %para efeito de teste, ainda não est?implementado
 	Op == 1, clear(50),write('\nMode: Humano contra Humano\n'),nl,
-	%estadoInicial(Tab),pecas_J1(Hand1), pecas_J2(Hand2),
-	%insere_todas_peca(j1,Hand1,Tab,Tab1),!, clear(50), insere_todas_peca(j2,Hand2,Tab1,Tab2),
+	estadoInicial(Tab),pecas_J1(Hand1), pecas_J2(Hand2),
+	/*insere_todas_peca(j1,Hand1,Tab,Tab1),!, clear(50),*/ insere_todas_peca(j2,Hand2,Tab,Tab2),
 	%funcionou até aqui, 2 jogadores inserir todas as sua pecas, falta determinar o Green so pode colocar ao lado do Castle.
 
-	estadoTeste(Tab2),
+	%estadoTeste(Tab2),
 	jogador_jogador(j1,Tab2),!;
 
 	Op == 2, write('\nMode: Humano contra Computador\n'),nl, menu_nivel,!;
@@ -72,10 +72,11 @@ insere_todas_peca(J,Hand,Tab,Tabf):-
 	mostra_hand(Hand,1),nl,
 	write('Peca: '),
 	read(P),
-	(   (integer(P), P>0, P=<HandSize) ->
-	(   !, remove_at(Hand,P,Peca,Hand2));
-	(   write('Opcao invalida, tenta novamente!'),
-	    nl,nl,sleep(1),insere_todas_peca(J,Hand,Tab,Tab1))),nl,
+	(
+	 (integer(P), P>0, P=<HandSize) -> (!, remove_at(Hand,P,Peca,Hand2));
+	 (write('Opcao invalida, tenta novamente!'),
+	 nl,nl,sleep(1),insere_todas_peca(J,Hand,Tab,Tab1))
+	),nl,
 
 	repeat,
 	(   (repeat, (write('Linha: '), read(Ln), linha_valida(J,Ln))),
@@ -92,33 +93,34 @@ insere_todas_peca(J,Hand,Tab,Tabf):-
 colocacao_valida(J,Peca,Ln,Cn,Tab):-
 	nth(Tab,Ln,LElm),
 	nth(LElm,Cn,Casa),
-/*	vizinhos(J,Tab,Ln,Cn,LisV),
-	member(Linhas,Tab),
+	vizinhos(J,Ln,Cn,Tab,LisV),
+	write(LisV),write(' teste0 '),write(J),
 
 	(   J==j1,
 	    (
-	     (Peca==aC,
-	      \+member(aG,Linhas);
-	      member(aG,LisV)
+	     (Peca==aC, \+get_peca_do_tab(j1,Ln,Cn,Tab,aG), \+peca_esta_no_tab(aG,Tab);
+	      member(aG,LisV),write(LisV),write(' testesssssss ')
 	     ) -> true;
-	     (Peca==aG,
-	      \+member(aC,Linhas);
+	     (Peca==aG, \+get_peca_do_tab(j1,Ln,Cn,Tab,aC), \+peca_esta_no_tab(aC,Tab);
 	      member(aC,LisV)
 	     ) -> true
 	    )->true;
 
 	    (Peca\=aC, Peca\=aG, Casa==0) -> true
 	),!;
-*/  %porque nao esta a funcionar o codigo de cima?????????????????????????????????????????????
 
-	(   J==j1,
-	    (Peca==aC; Peca==aG) -> true;
-	    (Peca\=aC, Peca\=aG, Casa==0) -> true
-	),!;
-
+	vizinhos(J,Ln,Cn,Tab,LisV2),
 	(   J==j2,
-	    (Peca==bC; Peca==bG) -> true;
-	    (Peca\=bC, Peca\=bG, Casa==0) -> true
+	    (
+	     (Peca==bC, \+get_peca_do_tab(j2,Ln,Cn,Tab,bG), \+peca_esta_no_tab(bG,Tab),write(' teste1 ');
+	      write('hello | '),write(LisV2), write(' | '),member(bG,LisV2),write(LisV2),write(' teste2 ')
+	     ) -> true;
+	     (Peca==aG, \+get_peca_do_tab(j2,Ln,Cn,Tab,bC), \+peca_esta_no_tab(bC,Tab),write(' teste3 ');
+	      member(bC,LisV2),write(' teste4 ')
+	     ) -> true
+	    ),write('impossible')->true;
+
+	    (Peca\=bC, Peca\=bG, Casa==0),write(' teste5 ') -> true
 	),!;
 
 	write('Jogada nao valida, tenta novamente!'),!,nl,fail.
@@ -215,6 +217,7 @@ jogador_jogador(J,Tab):-
 
 
 jogar(J,Tab):-
+
 	write('Escolhe a posicao da Peca pretende mover'),nl,
         repeat,
 	(   (repeat, (write('Linha: '), read(Ln1))),
@@ -236,7 +239,15 @@ jogada_nao_valida(Peca,Ln1,Cn1,Ln2,Cn2,Tab):-
 	write('funcina ate aqui.'),nl,fail.
 
 
-
+mover_mais_pecas(0):-!.
+mover_mais_pecas(N):-
+	N>1, N<14,
+	write('Pretende mover mais Pecas? (1: Sim | 2: Nao)'),nl,
+	read(Op),
+	(   integer(Op),Op==1 -> true;
+	Op==2 -> N is 0;
+	write('Opcao invalida, tenta novamente!'),nl,
+	mover_mais_pecas(N)).
 
 
 /*
@@ -285,9 +296,9 @@ faz_opcao(Op):-
 	writeln('opcao invalida, tenta novamente'), write('Opcao: '), faz_opcao(Op),!.
 
 
-/*
+
 %LisV - Lista dos vinhos
-vizinhos(J,Tab,Ln,Cn,LisV):-
+vizinhos(J,Ln,Cn,Tab,LisV):-
 
 	LnMais  is Ln+1,
 	LnMenos is Ln-1,
@@ -299,20 +310,11 @@ vizinhos(J,Tab,Ln,Cn,LisV):-
 	get_peca_do_tab(J,Ln,CnMais,Tab,Vdirecto),
 	get_peca_do_tab(J,Ln,CnMenos,Tab,Vesquerdo),
 
-	append(Vbaixo,Vcima,Vcn),
-	append(Vdirecto,Vesquerdo,Vln),
+	append([Vbaixo],[Vcima],Vcn),
+	append([Vdirecto],[Vesquerdo],Vln),
 	append(Vcn,Vln,LisV).
 
-*/
-%get_peca_do_tab(J,Ln,Cn,Tab,Peca)
-get_peca_do_tab(_,1,Cn,[H|_],Peca):-
-	nth(H,Cn,Peca),!.
 
-get_peca_do_tab(J,Ln,Cn,[_|T],Peca):-
-	Ln2 is Ln-1,
-	get_peca_do_tab(J,Ln2,Cn,T,Peca).
-
-/*
 %caso Vcima nao existe (Cn==0,Vesquerdo nao existe; Cn==25,Vdirecto nao existe)
 get_peca_do_tab(j1,0,_,_,[]):-!.    %jogador 1  LnMenos==1
 
@@ -331,17 +333,29 @@ get_peca_do_tab(_,_,0,_,[]):-!.		        %CnMenos==0
 %caso Vdirecto nao existe (Ln==0,Vcima nao existe; Ln==13,Vbaixo nao existe)
 get_peca_do_tab(_,_,25,_,[]):-!.                %CnMais==25
 
-*/
+
+
+
+%get_peca_do_tab(J,Ln,Cn,Tab,Peca)
+get_peca_do_tab(_,1,Cn,[H|_],Peca):-
+	nth(H,Cn,Peca),!.
+
+get_peca_do_tab(J,Ln,Cn,[_|T],Peca):-
+	Ln2 is Ln-1,
+	get_peca_do_tab(J,Ln2,Cn,T,Peca).
+
+
+
 
 
 peca_esta_no_tab(Peca,Tab):-
-	member(Peca,Sublista), member(Sublista,Tab),!;
+	(   member(Sublista,Tab), member(Peca,Sublista)) -> true,!;
 	fail.
 
 abc:-
 	estadoTeste2(Tabu),
 
-	peca_esta_no_tab(hi,Tabu),!,write(Tabu),!;
+	peca_esta_no_tab(aC,Tabu),!,write(Tabu),!;
 	write(falhou).
 
 
