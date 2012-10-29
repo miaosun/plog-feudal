@@ -46,7 +46,7 @@ menu_start:-
 comeca_jogo(Op):-    %para efeito de teste, ainda não est?implementado
 	Op == 1, clear(50),write('\nMode: Humano contra Humano\n'),nl,
 	estadoInicial(Tab),pecas_J1(Hand1), pecas_J2(Hand2),
-	/*insere_todas_peca(j1,Hand1,Tab,Tab1),!, clear(50),*/ insere_todas_peca(j2,Hand2,Tab,Tab2),
+	insere_todas_peca(j1,Hand1,Tab,Tab1),!, clear(50), insere_todas_peca(j2,Hand2,Tab1,Tab2),
 	%funcionou até aqui, 2 jogadores inserir todas as sua pecas, falta determinar o Green so pode colocar ao lado do Castle.
 
 	%estadoTeste(Tab2),
@@ -96,34 +96,37 @@ colocacao_valida(J,Peca,Ln,Cn,Tab):-
 	vizinhos(J,Ln,Cn,Tab,LisV),
 	write(LisV),write(' teste0 '),write(J),
 
-	(   J==j1,
+	(
+	 (   J==j1,
 	    (
-	     (Peca==aC, \+get_peca_do_tab(j1,Ln,Cn,Tab,aG), \+peca_esta_no_tab(aG,Tab);
-	      member(aG,LisV),write(LisV),write(' testesssssss ')
-	     ) -> true;
-	     (Peca==aG, \+get_peca_do_tab(j1,Ln,Cn,Tab,aC), \+peca_esta_no_tab(aC,Tab);
+	     (Peca==aC,
+	      (\+get_peca_do_tab(j1,Ln,Cn,Tab,aG), \+peca_esta_no_tab(aG,Tab));
+	       member(aG,LisV)
+	     );
+	     (Peca==aG,
+	      (\+get_peca_do_tab(j1,Ln,Cn,Tab,aC), \+peca_esta_no_tab(aC,Tab));
 	      member(aC,LisV)
-	     ) -> true
-	    )->true;
-                    %%%%%%%%porque quando insere bG volta aqui e da true???????????????????????????????????????????
-	    (Peca\=aC, Peca\=aG, Casa==0),write('nao e posivel') -> true %?????????????????????????????????????????
-	),!;
+	     );
 
-	vizinhos(J,Ln,Cn,Tab,LisV2),
+	    (Peca\=aC, Peca\=aG, Casa==0) )
+	 ),!;
+
 	(   J==j2,
-	    (
-	     (Peca==bC, \+get_peca_do_tab(j2,Ln,Cn,Tab,bG), \+peca_esta_no_tab(bG,Tab),write(' teste1 ');
-	      write('hello | '),write(LisV2), write(' | '),member(bG,LisV2),write(LisV2),write(' teste2 ')
-	     ) -> true;
-	     (Peca==aG, \+get_peca_do_tab(j2,Ln,Cn,Tab,bC), \+peca_esta_no_tab(bC,Tab),write(' teste3 ');
-	      member(bC,LisV2),write(' teste4 ')
-	     ) -> true
-	    ),write('impossible')->true;
+            (
+	     (Peca==bC,
+	      (\+get_peca_do_tab(j2,Ln,Cn,Tab,bG), \+peca_esta_no_tab(bG,Tab));
+	      (write('hello | '),write(LisV), write(' | '), member(bG,LisV),write(LisV),write(' teste2 '))
+	     );
+	     (Peca==bG,
+	      (\+get_peca_do_tab(j2,Ln,Cn,Tab,bC), \+peca_esta_no_tab(bC,Tab),write(' teste3 '));
+	       member(bC,LisV)
+	    );
 
-	    (Peca\=bC, Peca\=bG, Casa==0),write(' teste5 ') -> true
+	    (Peca\=bC, Peca\=bG, Casa==0),write(' teste5 '))
 	),!;
 
-	write('Jogada nao valida, tenta novamente!'),!,nl,fail.
+	 (write('Jogada nao valida, tenta novamente!'),!,nl,fail)
+	).
 
 
 
@@ -315,14 +318,13 @@ vizinhos(J,Ln,Cn,Tab,LisV):-
 	append(Vcn,Vln,LisV).
 
 
-%%%%%%%%%%%porque quando for embaixo ja nao funciona para jogador 2?????
-%get_peca_do_tab(J,Ln,Cn,Tab,Peca)          %???????????????????????????
-get_peca_do_tab(_,1,Cn,[H|_],Peca):-        %???????????????????????????
+%get_peca_do_tab(J,Ln,Cn,Tab,Peca)
+get_peca_do_tab(_,1,Cn,[H|_],Peca):-
 	nth(H,Cn,Peca),!.
 
 get_peca_do_tab(J,Ln,Cn,[_|T],Peca):-
 	Ln2 is Ln-1,
-	get_peca_do_tab(J,Ln2,Cn,T,Peca).
+	get_peca_do_tab(J,Ln2,Cn,T,Peca), !.
 
 
 %caso Vcima nao existe (Cn==0,Vesquerdo nao existe; Cn==25,Vdirecto nao existe)
