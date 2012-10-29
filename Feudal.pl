@@ -237,9 +237,47 @@ jogar(J,Tab):-
 	jogar(J,Tab).
 
 
-jogada_nao_valida(Peca,Ln1,Cn1,Ln2,Cn2,Tab):-
-	(   Ln1==Ln2, Cn1==Cn2) -> write('A posicao do destino e a mesma do origin, tenta novamente!'),nl,!;
-	write('funcina ate aqui.'),nl,fail.
+jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2,Tab):-
+	Ln1\=Ln2, Cn1\=Cn2,
+	write('funcina ate aqui.'),nl.
+
+move_valida_king(Peca,Ln1,Cn1,Ln2,Cn2):-
+	(Peca==aK; Peca==bK),
+	(      %%%%%falta mountanha e torreino
+	 (Ln1==Ln2,(Cn1-Cn2=<2; Cn2-Cn1=<2));
+	 (Cn1==Cn2,(Ln1-Ln2=<2; Ln2-Ln1=<2));
+	 ((Ln1-Ln2=:=2; Ln2-Ln1=:=2), (Cn1-Cn2=:=2; Cn2-Cn1=:=2))
+	).
+
+/*
+move_valida_mountedmen(Peca,Ln1,Cn1,Ln2,Cn2):-
+	mountedmen(MountedMen), member(Peca,MountedMen),
+	(
+	  nao hover mountanha ou terreino
+	).
+*/
+
+move_valida_sergents(Peca,Ln1,Cn1,Ln2,Cn2):-
+	(   Peca==aS; peca==bS),
+	 (  %%%%%falta mountanha e torreino
+	  (Ln1==Ln2, (Cn1-Cn2=:=1; Cn2-Cn1=:=1));
+	  (Cn1==Cn2, (Ln1-Ln2=:=1; Ln2-Ln1=:=1));
+	  ((Ln1-Ln2=<12; Ln2-Ln1=<12), (Cn1-Cn2=<12; Cn2-Cn1=<12))
+	 ).
+
+
+move_valida_pikemen(Peca,Ln1,Cn1,Ln2,Cn2):-
+	(   Peca==ap; Peca==bp),
+	(   %%%%%falta mountanha e torreino
+	 (Ln1==Ln2, (Cn1-Cn2=<12; Cn2-Cn1=<12));
+	 (Cn1==Cn2, (Ln1-Ln2=<12; Ln2-Ln1=<12));
+	 ((Ln1-Ln2=:=1; Ln2-Ln1=:=1), (Cn1-Cn2=:=1; Cn2-Cn1=:=1))
+	).
+
+
+
+
+
 
 
 mover_mais_pecas(0):-!.
@@ -346,19 +384,11 @@ get_peca_do_tab(_,_,0,_,[]):-!.		        %CnMenos==0
 get_peca_do_tab(_,_,25,_,[]):-!.                %CnMais==25
 
 
-
-
-
-
+%verifica se a peca esta no tabuleiro
 peca_esta_no_tab(Peca,Tab):-
-	(   member(Sublista,Tab), member(Peca,Sublista)) -> true,!;
+	(   member(Sublista,Tab), member(Peca,Sublista)),!;
 	fail.
 
-abc:-
-	estadoTeste2(Tabu),
-
-	peca_esta_no_tab(aC,Tabu),!,write(Tabu),!;
-	write(falhou).
 
 
 
