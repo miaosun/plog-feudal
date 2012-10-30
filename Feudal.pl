@@ -250,18 +250,18 @@ move_valida_king(Peca,Ln1,Cn1,Ln2,Cn2):-
 	 ((Ln1-Ln2=:=1; Ln2-Ln1=:=1), (Cn1-Cn2=:=1; Cn2-Cn1=:=1))
 	).
 
-% FALTA TESTAR SEMPRE SE NAO SAI DO TABULEIRO
-% E SE NAO PASSA POR MONTANHAS OU TERRENO
+
+% VALIDAR QUE NAO PASSA POR MONTANHAS OU TERRENO
 
 move_valida_mountedmen(Peca,Ln1,Cn1,Ln2,Cn2):-
 	mountedmen(MountedMen), member(Peca,MountedMen),
 	( (Ln1==Ln2;Cn1==Cn2);
-	(((abs(Ln1-Ln2)\=0);abs(Cn1-Cn2)\=0),(abs(Ln1-Ln2)==abs(Cn1-Cn2))) ).
-
+	(((abs(Ln1-Ln2)\=0);abs(Cn1-Cn2)\=0),(abs(Ln1-Ln2)==abs(Cn1-Cn2)))
+	).
 
 
 move_valida_sergeants(Peca,Ln1,Cn1,Ln2,Cn2):-
-	(   Peca==aS; peca==bS),
+	(Peca==aS; peca==bS),
 	 (  %%%%%falta mountanha e terreno
 	  (Ln1==Ln2, (Cn1-Cn2=:=1; Cn2-Cn1=:=1));
 	  (Cn1==Cn2, (Ln1-Ln2=:=1; Ln2-Ln1=:=1));
