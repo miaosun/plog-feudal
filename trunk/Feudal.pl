@@ -289,7 +289,16 @@ move_valida_archer(Peca,Ln1,Cn1,Ln2,Cn2):-
 	). %será que se pode melhorar para não ter 3 linhas? usando modulo?
 
 
-%move_valida_squire(Peca,Ln1,Cn1,Ln2,Cn2):- .
+move_valida_squire(Peca,Ln1,Cn1,Ln2,Cn2):-
+	(   Peca==as; Peca==bs),
+	(
+	 (   (Ln1-Ln2=:=1;Ln2-Ln1=:=1), (Cn1-Cn2=:=2;Cn2-Cn1=:=2));
+	 (   (Ln1-Ln2=:=2;Ln2-Ln1=:=2), (Cn1-Cn2=:=1;Cn2-Cn1=:=1))
+	).
+
+% Porque squire nao funciona assim? :
+% ( (abs(Ln1-Ln2)==1), (abs(Cn1-Cn2)==2))
+%   ( (abs(Ln1-Ln2)==2), (abs(Cn1-Cn2)==1))
 
 
 mover_mais_pecas(0):-!.
