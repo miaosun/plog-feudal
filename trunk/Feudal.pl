@@ -276,7 +276,15 @@ move_valida_pikemen(Peca,Ln1,Cn1,Ln2,Cn2):-
 	).
 
 
-
+move_valida_archer(Peca,Ln1,Cn1,Ln2,Cn2):-
+	(   Peca==aa; Peca==ba),
+	(
+	 (Ln1==Ln2,(Cn1-Cn2=<3; Cn2-Cn1=<3));
+	 (Cn1==Cn2,(Ln1-Ln2=<3; Ln2-Ln1=<3));
+	 ((Ln1-Ln2=:=2; Ln2-Ln1=:=2), (Cn1-Cn2=:=2; Cn2-Cn1=:=2));
+	 ((Ln1-Ln2=:=1; Ln2-Ln1=:=1), (Cn1-Cn2=:=1; Cn2-Cn1=:=1));
+	 ((Ln1-Ln2=:=3; Ln2-Ln1=:=3), (Cn1-Cn2=:=3; Cn2-Cn1=:=3))
+	). %será que se pode melhorar para não ter 3 linhas?
 
 
 
