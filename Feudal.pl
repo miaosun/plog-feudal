@@ -233,21 +233,20 @@ jogar(J,Tab):-
         write('Linha: '), read(Ln2),
 	write('Coluna: '), read(Cn2),
 
-	jogada_nao_valida(Peca,Ln1,Cn1,Ln2,Cn2,Tab),nl,
+	jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2,Tab),nl,
 	jogar(J,Tab).
 
 
 jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2,Tab):-
-	Ln1\=Ln2, Cn1\=Cn2,
+	(Ln1\=Ln2; Cn1\=Cn2),
 	write('funcina ate aqui.'),nl.
 
 move_valida_king(Peca,Ln1,Cn1,Ln2,Cn2):-
 	(Peca==aK; Peca==bK),
 	(      %%%%%falta mountanha e torreino
-	 (Ln1==Ln2,(Cn1-Cn2=<2; Cn2-Cn1=<2));
-	 (Cn1==Cn2,(Ln1-Ln2=<2; Ln2-Ln1=<2));
-	 ((Ln1-Ln2=:=2; Ln2-Ln1=:=2), (Cn1-Cn2=:=2; Cn2-Cn1=:=2));
-	 ((Ln1-Ln2=:=1; Ln2-Ln1=:=1), (Cn1-Cn2=:=1; Cn2-Cn1=:=1))
+	 (Ln1==Ln2, abs(Cn1-Cn2)=<2);
+	 (Cn1==Cn2, abs(Ln1-Ln2)=<2);
+	 (abs(Ln1-Ln2)=<2,abs(Ln1-Ln2)=:=abs(Cn1-Cn2))
 	).
 
 
@@ -255,50 +254,45 @@ move_valida_king(Peca,Ln1,Cn1,Ln2,Cn2):-
 
 move_valida_mountedmen(Peca,Ln1,Cn1,Ln2,Cn2):-
 	mountedmen(MountedMen), member(Peca,MountedMen),
-	( (Ln1==Ln2;Cn1==Cn2);
-	(((abs(Ln1-Ln2)\=0);abs(Cn1-Cn2)\=0),(abs(Ln1-Ln2)==abs(Cn1-Cn2)))
+	(  %%%%falta mountanha e torreino
+	 (Ln1==Ln2;Cn1==Cn2);
+	 (abs(Ln1-Ln2)=:=abs(Cn1-Cn2))
 	).
 
 
 move_valida_sergeants(Peca,Ln1,Cn1,Ln2,Cn2):-
 	(Peca==aS; peca==bS),
 	 (  %%%%%falta mountanha e terreno
-	  (Ln1==Ln2, (Cn1-Cn2=:=1; Cn2-Cn1=:=1));
-	  (Cn1==Cn2, (Ln1-Ln2=:=1; Ln2-Ln1=:=1));
-	  ((Ln1-Ln2=<12; Ln2-Ln1=<12), (Cn1-Cn2=<12; Cn2-Cn1=<12), ((abs(Ln1-Ln2))=:=(abs(Cn1-Cn2))))
+	  (Ln1==Ln2, abs(Cn1-Cn2)=:=1);
+	  (Cn1==Cn2, abs(Ln1-Ln2)=:=1);
+	  (abs(Ln1-Ln2)=<12, abs(Ln1-Ln2)=:=abs(Cn1-Cn2))
 	 ).
 
 
 move_valida_pikemen(Peca,Ln1,Cn1,Ln2,Cn2):-
-	(   Peca==ap; Peca==bp),
-	(   %%%%%falta mountanha e torreino
-	 (Ln1==Ln2, (Cn1-Cn2=<12; Cn2-Cn1=<12));
-	 (Cn1==Cn2, (Ln1-Ln2=<12; Ln2-Ln1=<12));
-	 ((Ln1-Ln2=:=1; Ln2-Ln1=:=1), (Cn1-Cn2=:=1; Cn2-Cn1=:=1))
-	).
-
-
-move_valida_archer(Peca,Ln1,Cn1,Ln2,Cn2):-
-	(   Peca==aa; Peca==ba),
-	(
-	 (Ln1==Ln2,(Cn1-Cn2=<3; Cn2-Cn1=<3));
-	 (Cn1==Cn2,(Ln1-Ln2=<3; Ln2-Ln1=<3));
-	 ((Ln1-Ln2=:=2; Ln2-Ln1=:=2), (Cn1-Cn2=:=2; Cn2-Cn1=:=2));
-	 ((Ln1-Ln2=:=1; Ln2-Ln1=:=1), (Cn1-Cn2=:=1; Cn2-Cn1=:=1));
-	 ((Ln1-Ln2=:=3; Ln2-Ln1=:=3), (Cn1-Cn2=:=3; Cn2-Cn1=:=3))
-	). %será que se pode melhorar para não ter 3 linhas? usando modulo?
+        (Peca==ap; Peca==bp),
+	 (   %%%%%falta mountanha e torreino
+	  (Ln1==Ln2, abs(Cn1-Cn2)=<12);
+	  (Cn1==Cn2, abs(Ln1-Ln2)=<12);
+	  (abs(Ln1-Ln2)=:=1, abs(Cn1-Cn2)=:=1)
+         ).
 
 
 move_valida_squire(Peca,Ln1,Cn1,Ln2,Cn2):-
-	(   Peca==as; Peca==bs),
-	(
-	 (   (Ln1-Ln2=:=1;Ln2-Ln1=:=1), (Cn1-Cn2=:=2;Cn2-Cn1=:=2));
-	 (   (Ln1-Ln2=:=2;Ln2-Ln1=:=2), (Cn1-Cn2=:=1;Cn2-Cn1=:=1))
-	).
+	(Peca==as; Peca==bs),
+	 (  %%%%%%falta mountanha e torreino
+	  (abs(Ln1-Ln2)=:=1, abs(Cn1-Cn2)=:=2);
+	  (abs(Ln1-Ln2)=:=2, abs(Cn1-Cn2)=:=1)
+	 ).
 
-% Porque squire nao funciona assim? :
-% ( (abs(Ln1-Ln2)==1), (abs(Cn1-Cn2)==2))
-%   ( (abs(Ln1-Ln2)==2), (abs(Cn1-Cn2)==1))
+
+move_valida_archer(Peca,Ln1,Cn1,Ln2,Cn2):-
+	(Peca==aa; Peca==ba),
+	 (  %%%%%falta mountanha e torreino, e caso de shoot enemy
+	  (Ln1==Ln2, abs(Cn1-Cn2)=<3);
+	  (Cn1==Cn2, abs(Ln1-Ln2)=<3);
+	  (abs(Ln1-Ln2)=<3, abs(Ln1-Ln2)=:=abs(Cn1-Cn2))
+	 ).
 
 
 mover_mais_pecas(0):-!.
