@@ -22,7 +22,7 @@
 % bK - King      x1
 % bP - Prince    x1
 % bD - Duke      x1
-% bK - Knights   x2
+% bk - Knights   x2
 % bS - Sergeants x2
 % bs - Squire    x1
 % ba - Archer    x1
