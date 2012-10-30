@@ -246,7 +246,8 @@ move_valida_king(Peca,Ln1,Cn1,Ln2,Cn2):-
 	(      %%%%%falta mountanha e torreino
 	 (Ln1==Ln2,(Cn1-Cn2=<2; Cn2-Cn1=<2));
 	 (Cn1==Cn2,(Ln1-Ln2=<2; Ln2-Ln1=<2));
-	 ((Ln1-Ln2=:=2; Ln2-Ln1=:=2), (Cn1-Cn2=:=2; Cn2-Cn1=:=2))
+	 ((Ln1-Ln2=:=2; Ln2-Ln1=:=2), (Cn1-Cn2=:=2; Cn2-Cn1=:=2));
+	 ((Ln1-Ln2=:=1; Ln2-Ln1=:=1), (Cn1-Cn2=:=1; Cn2-Cn1=:=1))
 	).
 
 /*
@@ -259,10 +260,10 @@ move_valida_mountedmen(Peca,Ln1,Cn1,Ln2,Cn2):-
 
 move_valida_sergents(Peca,Ln1,Cn1,Ln2,Cn2):-
 	(   Peca==aS; peca==bS),
-	 (  %%%%%falta mountanha e torreino
+	 (  %%%%%falta mountanha e terreno
 	  (Ln1==Ln2, (Cn1-Cn2=:=1; Cn2-Cn1=:=1));
 	  (Cn1==Cn2, (Ln1-Ln2=:=1; Ln2-Ln1=:=1));
-	  ((Ln1-Ln2=<12; Ln2-Ln1=<12), (Cn1-Cn2=<12; Cn2-Cn1=<12))
+	  ((Ln1-Ln2=<12; Ln2-Ln1=<12), (Cn1-Cn2=<12; Cn2-Cn1=<12), ((abs(Ln1-Ln2))=:=(abs(Cn1-Cn2))))
 	 ).
 
 
@@ -338,7 +339,7 @@ faz_opcao(Op):-
 
 
 
-%LisV - Lista dos vinhos
+%LisV - Lista dos vizinhos
 vizinhos(J,Ln,Cn,Tab,LisV):-
 
 	LnMais  is Ln+1,
