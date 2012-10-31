@@ -45,11 +45,11 @@ menu_start:-
 
 comeca_jogo(Op):-    %para efeito de teste, ainda não est?implementado
 	Op == 1, clear(50),write('\nMode: Humano contra Humano\n'),nl,
-	estadoInicial(Tab),pecas_J1(Hand1), pecas_J2(Hand2),
-	insere_todas_peca(j1,Hand1,Tab,Tab1),!, clear(50), insere_todas_peca(j2,Hand2,Tab1,Tab2),
-	%funcionou até aqui, 2 jogadores inserir todas as sua pecas, falta determinar o Green so pode colocar ao lado do Castle.
+	%estadoInicial(Tab),pecas_J1(Hand1), pecas_J2(Hand2),
+	%insere_todas_peca(j1,Hand1,Tab,Tab1),!, clear(50),
+	%insere_todas_peca(j2,Hand2,Tab1,Tab2),!, clear(50),
 
-	%estadoTeste(Tab2),
+	estadoTeste(Tab2),
 	jogador_jogador(j1,Tab2),!;
 
 	Op == 2, write('\nMode: Humano contra Computador\n'),nl, menu_nivel,!;
@@ -73,16 +73,15 @@ insere_todas_peca(J,Hand,Tab,Tabf):-
 	write('Peca: '),
 	read(P),
 	(
-	 (integer(P), P>0, P=<HandSize) -> (!, remove_at(Hand,P,Peca,Hand2));
-	 (write('Opcao invalida, tenta novamente!'),
-	 nl,nl,sleep(1),insere_todas_peca(J,Hand,Tab,Tab1))
-	),nl,
+	 (integer(P), P>0, P=<HandSize, remove_at(Hand,P,Peca,Hand2));
+	 (write('Opcao invalida, tenta novamente!'),nl,nl,sleep(1),
+	  insere_todas_peca(J,Hand,Tab,Tab1))),nl,
 
 	repeat,
-	(   (repeat, (write('Linha: '), read(Ln), linha_valida(J,Ln))),
-	    (write('Coluna: '), read(Cn), coluna_valida(J,Cn)),
-	    colocacao_valida(J,Peca,Ln,Cn,Tab)
-	),
+	((repeat, (write('Linha: '), read(Ln), linha_valida_inserir(J,Ln))),
+	 (write('Coluna: '), read(Cn), coluna_valida(Cn)),
+	  colocacao_valida(J,Peca,Ln,Cn,Tab)
+	),!,
 
 	insere_peca_no_tab(Peca,Ln,Cn,Tab,Tab1), insere_todas_peca(J,Hand2,Tab1,Tabf).
 
@@ -94,40 +93,20 @@ colocacao_valida(J,Peca,Ln,Cn,Tab):-
 	nth(Tab,Ln,LElm),
 	nth(LElm,Cn,Casa),
 	vizinhos(J,Ln,Cn,Tab,LisV),
-	write(LisV),write(' teste0 '),write(J),
-
+        get_peca_do_tab(J,Ln,Cn,Tab,PecaTab),
 	(
-	 (   J==j1,
-	    (
-	     (Peca==aC,
-	      (\+get_peca_do_tab(j1,Ln,Cn,Tab,aG), \+peca_esta_no_tab(aG,Tab));
-	       member(aG,LisV)
-	     );
-	     (Peca==aG,
-	      (\+get_peca_do_tab(j1,Ln,Cn,Tab,aC), \+peca_esta_no_tab(aC,Tab));
-	      member(aC,LisV)
-	     );
+	 (J==j1,
+	    ((Peca==aC, ((PecaTab\=aG, \+peca_esta_no_tab(aG,Tab)); member(aG,LisV)));
+	     (Peca==aG, ((PecaTab\=aC, \+peca_esta_no_tab(aC,Tab)); member(aC,LisV)));
+	     (Peca\=aC, Peca\=aG, Casa==0)) ),!;
 
-	    (Peca\=aC, Peca\=aG, Casa==0) )
-	 ),!;
-
-	(   J==j2,
-            (
-	     (Peca==bC,
-	      (\+get_peca_do_tab(j2,Ln,Cn,Tab,bG), \+peca_esta_no_tab(bG,Tab));
-	      (write('hello | '),write(LisV), write(' | '), member(bG,LisV),write(LisV),write(' teste2 '))
-	     );
-	     (Peca==bG,
-	      (\+get_peca_do_tab(j2,Ln,Cn,Tab,bC), \+peca_esta_no_tab(bC,Tab),write(' teste3 '));
-	       member(bC,LisV)
-	    );
-
-	    (Peca\=bC, Peca\=bG, Casa==0),write(' teste5 '))
-	),!;
+	 (J==j2,
+            ((Peca==bC, ((PecaTab\=bG, \+peca_esta_no_tab(bG,Tab)); member(bG,LisV)));
+	     (Peca==bG, ((PecaTab\=bC, \+peca_esta_no_tab(bC,Tab)); member(bC,LisV)));
+	     (Peca\=bC, Peca\=bG, Casa==0)) ),!;
 
 	 (write('Jogada nao valida, tenta novamente!'),!,nl,fail)
 	).
-
 
 
 
@@ -183,24 +162,27 @@ remove_at([Y|Xs],N,Peca,[Y|Ys]) :- N > 1,
    N1 is N - 1, remove_at(Xs,N1,Peca,Ys).
 
 
-coluna_valida(_,Cn):-
-	Cn>=1, Cn=<24,!;
-	write('Coluna invalida, tenta novamente!'),nl,fail.
-
-linha_valida(J,Ln):-
+linha_valida_inserir(J,Ln):-
 	(   J == j1, Ln>=1,  Ln=<12),!;
 	(   J == j2, Ln>=13, Ln=<24),!;
 	write('Linha invalida, tenta novamente!'),nl,fail.
 
+linha_valida(Ln):-
+	Ln>=1, Ln=<24,!;
+	write('Linha invalida, tenta novamente!'),nl,fail.
+
+coluna_valida(Cn):-
+	Cn>=1, Cn=<24,!;
+	write('Coluna invalida, tenta novamente!'),nl,fail.
 
 
 
 jogador_jogador(J,Tab):-
-	vez_jogador(J,Tab),nl,
+%	vez_jogador(J,Tab),nl,
 	%(   game_over(Tab), write('Obrigado por jogar!'),nl);
 
 
-	print_legenda,
+%	print_legenda,
 	jogar(J,Tab).
 
 /*	write('Escolhe a posicao da Peca pretende mover'),nl,
@@ -220,26 +202,33 @@ jogador_jogador(J,Tab):-
 
 
 jogar(J,Tab):-
+        vez_jogador(J,Tab),nl,
+        print_legenda,
 
 	write('Escolhe a posicao da Peca pretende mover'),nl,
         repeat,
-	(   (repeat, (write('Linha: '), read(Ln1))),
-	    (write('Coluna: '), read(Cn1), permite_mover(J,Ln1,Cn1,Tab,Peca),!
-
+	(   (repeat, (write('Linha: '), read(Ln1), linha_valida(Ln1))),
+	    (write('Coluna: '), read(Cn1), coluna_valida(Cn1),permite_mover(J,Ln1,Cn1,Tab,Peca),!
 	)),nl,nl,
 
         write('Escolhe a posicao do destino'),nl,
+        repeat,
+        (   (repeat, (write('Linha: '), read(Ln2), linha_valida(Ln2))),
+	    (write('Coluna: '), read(Cn2), coluna_valida(Cn2))),!,
 
-        write('Linha: '), read(Ln2),
-	write('Coluna: '), read(Cn2),
-
-	jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2,Tab),nl,
-	jogar(J,Tab).
+	((jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2),nl);
+	 nl, write('Movimento nao valido, tenta novamente!'),nl,sleep(1),clear(10),jogar(J,Tab)).
 
 
-jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2,Tab):-
+jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2):-
 	(Ln1\=Ln2; Cn1\=Cn2),
-	write('funcina ate aqui.'),nl.
+	(move_valida_king(Peca,Ln1,Cn1,Ln2,Cn2);
+	 move_valida_mountedmen(Peca,Ln1,Cn1,Ln2,Cn2);
+	 move_valida_sergeants(Peca,Ln1,Cn1,Ln2,Cn2);
+	 move_valida_pikemen(Peca,Ln1,Cn1,Ln2,Cn2);
+	 move_valida_squire(Peca,Ln1,Cn1,Ln2,Cn2);
+	 move_valida_archer(Peca,Ln1,Cn1,Ln2,Cn2)).
+
 
 move_valida_king(Peca,Ln1,Cn1,Ln2,Cn2):-
 	(Peca==aK; Peca==bK),
@@ -251,7 +240,6 @@ move_valida_king(Peca,Ln1,Cn1,Ln2,Cn2):-
 
 
 % VALIDAR QUE NAO PASSA POR MONTANHAS OU TERRENO
-
 move_valida_mountedmen(Peca,Ln1,Cn1,Ln2,Cn2):-
 	mountedmen(MountedMen), member(Peca,MountedMen),
 	(  %%%%falta mountanha e torreino
@@ -328,12 +316,9 @@ permite_mover(J,Ln,Cn,Tab,Peca):-
 	pecas_J1(Pecas_J1),
 	pecas_J2(Pecas_J2),
 	get_peca_do_tab(J,Ln,Cn,Tab,Peca),
-	(   J==j1, Peca\=aC, Peca\=aG, member(Peca,Pecas_J1)),!;
-	(   J==j2, Peca\=bC, Peca\=bG, member(Peca,Pecas_J2)),!;
-	write('Casa vazia ou nao se permite mover a peca!'),nl,fail.
-
-
-
+	((J==j1, Peca\=aC, Peca\=aG, member(Peca,Pecas_J1)),!;
+	 (J==j2, Peca\=bC, Peca\=bG, member(Peca,Pecas_J2)),!;
+	 write('Casa vazia ou nao se permite mover a peca!'),nl,fail).
 
 
 
