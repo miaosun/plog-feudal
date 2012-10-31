@@ -13,6 +13,10 @@ start:-
 	welcome,
 	menu_start.
 
+trocar_vez(j1,j2).
+trocar_vez(j2,j1).
+
+
 %limpa a ecra com N linhas
 clear(0):-!.
 clear(N):- N1 is N-1, nl, !,clear(N1).
@@ -176,32 +180,35 @@ coluna_valida(Cn):-
 	write('Coluna invalida, tenta novamente!'),nl,fail.
 
 
+%um jogador no maximo pode mover 13 pecas em cada jogada
+mover_mais_pecas(J,3,Jf):-trocar_vez(J,Jf),!.
+mover_mais_pecas(J,N,Jf):-
+	%N=<15, quando a invocar comeca por o nº das pecas de cada jogador
+	write('Pretende mover mais Pecas? (1: Sim | 2: Nao)'),nl,
+	read(Op),
+	((integer(Op),((Op==1,Jf=J); (Op==2, trocar_vez(J,Jf))));
+	 write('Opcao invalida, tenta novamente!'),nl,
+	 N1 is N-1, mover_mais_pecas(J,N1,Jf)).
 
-jogador_jogador(J,Tab):-
-%	vez_jogador(J,Tab),nl,
+
+jogador_jogador(J,Tab):-   %%%%%%%%%ainda tem que ser ver melhor a construcao deste predicado!!!!!!!!!
 	%(   game_over(Tab), write('Obrigado por jogar!'),nl);
 
+	pecas_J1(Pecas_J1), pecas_J2(Pecas_J2),
+	length(Pecas_J1,size_P_J1), length(Pecas_J2,size_P_J2),
+	%length serve para determinar o maximo movimentos cada jogadr pode fazer em cada jogada
+	jogar(J,Tab,Tabf),
 
-%	print_legenda,
-	jogar(J,Tab).
+	((J==j1, mover_mais_pecas(j1,size_p_J1,Jf));
+	 (J==j2, mover_mais_pecas(j2,size_p_J2,Jf))),
 
-/*	write('Escolhe a posicao da Peca pretende mover'),nl,
-        repeat,
-	(   (repeat, (write('Linha: '), read(Ln))),
-	    (write('Coluna: '), read(Cn), permite_mover(J,Ln,Cn,Tab,Peca)
+	%falta proceder movimentos,colocacoes...
 
-	)),write(Peca),write(ok),
-
-        write('Escolhe a posicao do destino'),nl,
-        repeat,
-	(   (repeat, (write('Linha: '), read(Ln))),
-	    (write('Coluna: '), read(Cn), write(hello) %jogada_valida()
-
-	)),write(final).
-*/
+	jogador_jogador(Jf,Tabf).
 
 
-jogar(J,Tab):-
+
+jogar(J,Tab,Tabf):-
         vez_jogador(J,Tab),nl,
         print_legenda,
 
@@ -216,8 +223,11 @@ jogar(J,Tab):-
         (   (repeat, (write('Linha: '), read(Ln2), linha_valida(Ln2))),
 	    (write('Coluna: '), read(Cn2), coluna_valida(Cn2))),!,
 
-	((jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2),nl);
-	 nl, write('Movimento nao valido, tenta novamente!'),nl,sleep(1),clear(10),jogar(J,Tab)).
+	get_peca_do_tab(J,Ln1,Cn1,Tab,Peca),
+
+	((jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2),remover_do_tab(Ln1,Cn1,Tab,Tab1),
+	  insere_peca_no_tab(Peca,Ln2,Cn2,Tab1,Tabf));
+	 nl, write('Movimento nao valido, tenta novamente!'),nl,sleep(1),clear(10),jogar(J,Tab,Tabf)).
 
 
 jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2):-
@@ -283,17 +293,6 @@ move_valida_archer(Peca,Ln1,Cn1,Ln2,Cn2):-
 	 ).
 
 
-mover_mais_pecas(0):-!.
-mover_mais_pecas(N):-
-	N>1, N<14,
-	write('Pretende mover mais Pecas? (1: Sim | 2: Nao)'),nl,
-	read(Op),
-	(   integer(Op),Op==1 -> true;
-	Op==2 -> N is 0;
-	write('Opcao invalida, tenta novamente!'),nl,
-	mover_mais_pecas(N)).
-
-
 /*
 
 game_over(Tab):-
@@ -311,7 +310,6 @@ game_over(Tab):-
 
 
 
-
 permite_mover(J,Ln,Cn,Tab,Peca):-
 	pecas_J1(Pecas_J1),
 	pecas_J2(Pecas_J2),
@@ -319,8 +317,6 @@ permite_mover(J,Ln,Cn,Tab,Peca):-
 	((J==j1, Peca\=aC, Peca\=aG, member(Peca,Pecas_J1)),!;
 	 (J==j2, Peca\=bC, Peca\=bG, member(Peca,Pecas_J2)),!;
 	 write('Casa vazia ou nao se permite mover a peca!'),nl,fail).
-
-
 
 
 vez_jogador(J,Tab):-
@@ -407,6 +403,4 @@ vez(N,Lis):-
 	),!,
 	write(Lis2),nl,write(N1),nl,
 	vez(N1,Lis2).
-
-
 
