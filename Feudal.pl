@@ -195,12 +195,14 @@ jogador_jogador(J,Tab):-   %%%%%%%%%ainda tem que ser ver melhor a construcao de
 	%(   game_over(Tab), write('Obrigado por jogar!'),nl);
 
 	pecas_J1(Pecas_J1), pecas_J2(Pecas_J2),
-	length(Pecas_J1,size_P_J1), length(Pecas_J2,size_P_J2),
+	length(Pecas_J1,Size_P_J1), length(Pecas_J2,Size_P_J2),
 	%length serve para determinar o maximo movimentos cada jogadr pode fazer em cada jogada
 	jogar(J,Tab,Tabf),
 
-	((J==j1, mover_mais_pecas(j1,size_p_J1,Jf));
-	 (J==j2, mover_mais_pecas(j2,size_p_J2,Jf))),
+	vez_jogador(J,Tabf),
+
+	((J==j1, mover_mais_pecas(j1,Size_P_J1,Jf));
+	 (J==j2, mover_mais_pecas(j2,Size_P_J2,Jf))),
 
 	%falta proceder movimentos,colocacoes...
 
@@ -226,7 +228,7 @@ jogar(J,Tab,Tabf):-
 	get_peca_do_tab(J,Ln1,Cn1,Tab,Peca),
 
 	((jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2),remover_do_tab(Ln1,Cn1,Tab,Tab1),
-	  insere_peca_no_tab(Peca,Ln2,Cn2,Tab1,Tabf));
+	  insere_peca_no_tab(Peca,Ln2,Cn2,Tab1,Tabf),nl);
 	 nl, write('Movimento nao valido, tenta novamente!'),nl,sleep(1),clear(10),jogar(J,Tab,Tabf)).
 
 
