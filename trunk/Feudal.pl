@@ -181,14 +181,13 @@ coluna_valida(Cn):-
 
 
 %um jogador no maximo pode mover 13 pecas em cada jogada
-mover_mais_pecas(J,3,Jf):-trocar_vez(J,Jf),!.
-mover_mais_pecas(J,N,Jf):-
-	%N=<15, quando a invocar comeca por o nº das pecas de cada jogador
+%mover_mais_pecas(J,3,Jf):-trocar_vez(J,Jf),!.
+mover_mais_pecas(J,Jf):-
 	write('Pretende mover mais Pecas? (1: Sim | 2: Nao)'),nl,
 	read(Op),
 	((integer(Op),((Op==1,Jf=J); (Op==2, trocar_vez(J,Jf))));
 	 write('Opcao invalida, tenta novamente!'),nl,
-	 N1 is N-1, mover_mais_pecas(J,N1,Jf)).
+	 mover_mais_pecas(J,Jf)).
 
 
 jogador_jogador(J,Tab,Tabf):-   %%%%%%%%%ainda tem que ser ver melhor a construcao deste predicado!!!!!!!!!
@@ -209,13 +208,11 @@ jogador_jogador(J,Tab,Tabf):-   %%%%%%%%%ainda tem que ser ver melhor a construc
 %	jogador_jogador(Jf,Tabf).
 
 
-
 jogar(J,Tab,Tabf):-
         vez_jogador(J,Tab),nl,
         print_legenda,
 
 	pecas_J1(Pecas_J1), pecas_J2(Pecas_J2),
-	length(Pecas_J1,Size_P_J1), length(Pecas_J2,Size_P_J2),
 
 	write('Escolhe a posicao da Peca pretende mover'),nl,
         repeat,
@@ -231,11 +228,14 @@ jogar(J,Tab,Tabf):-
 	get_peca_do_tab(J,Ln1,Cn1,Tab,Peca),
 	get_peca_do_tab(J,Ln2,Cn2,Tab,Casa),
 
-	(((J==j1, \+member(Casa,Pecas_J1)); (J==j2, \+member(Casa,Pecas_J2))),
-	 (jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2,Tab),remover_do_tab(Ln1,Cn1,Tab,Tab1),
-	  insere_peca_no_tab(Peca,Ln2,Cn2,Tab1,Tab2),nl,vez_jogador(J,Tab2),
-	  ((J==j1, mover_mais_pecas(j1,Size_P_J1,Jf));
-	   (J==j2, mover_mais_pecas(j2,Size_P_J2,Jf))), jogar(Jf,Tab2,Tabf));
+	(((J==j1, \+member(Casa,Pecas_J1)); (J==j2, \+member(Casa,Pecas_J2))), %verifica se a posicao destino é uma peca do jogador
+	 (jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2,Tab), %verifica se o movimento da peca é valido
+	  remover_do_tab(Ln1,Cn1,Tab,Tab1), %tira a peca da posicao origin fica uma casa vazia
+	  insere_peca_no_tab(Peca,Ln2,Cn2,Tab1,Tab2), %coloca a peca origin na posicao destino
+	  nl,vez_jogador(J,Tab2),
+	  ((J==j1, mover_mais_pecas(j1,Jf));
+	   (J==j2, mover_mais_pecas(j2,Jf))),
+	  jogar(Jf,Tab2,Tabf));
 	 nl, write('Movimento nao valido, tenta novamente!'),nl,sleep(1),clear(10),jogar(J,Tab,Tabf)).
 
 
@@ -243,7 +243,8 @@ jogar(J,Tab,Tabf):-
 caminho(Ln1,Cn1,Ln2,Cn2,Tab,Caminho):-
 	(Ln1==Ln2, caminho_coluna(Ln1,Cn1,Cn2,Tab,[],Caminho));
 	(Cn1==Cn2, caminho_linha(Ln1,Ln2,Cn1,Tab,[],Caminho));
-	(abs(Ln1-Ln2)=:=abs(Cn1-Cn2), caminho_diagonal(Ln1,Ln2,Cn1,Cn2,Tab,[],Caminho)).
+	(abs(Ln1-Ln2)=:=abs(Cn1-Cn2), caminho_diagonal(Ln1,Ln2,Cn1,Cn2,Tab,[],Caminho));
+	caminho_squire(Ln1,Ln2,Cn1,Cn2,Tab,[],Caminho).
 
 
 %cria uma lista de caminho em coluna
@@ -272,75 +273,64 @@ caminho_diagonal(Ln1,Linha,Cn1,Coluna,Tab,Lis,Caminho_Diagonal):-
 	 caminho_diagonal(Ln1,Linha2,Cn1,Coluna2,Tab,Lis1,Caminho_Diagonal)).
 
 caminho_squire(Ln1,Linha,Cn1,Coluna,Tab,Lis,Caminho_Squire):-
-	(abs(Linha-Ln1)=:=1, abs(Coluna-Cn1)=:=1, Caminho_Squire=Lis),
+	(( (abs(Linha-Ln1)=:=1,Coluna==Cn1); (Linha==Ln1,abs(Coluna-Cn1)=:=1)), Caminho_Squire=Lis,!);
 	(get_peca_do_tab(_,Linha,Coluna,Tab,Peca),
 	 append([Peca],Lis,Lis1),
-	 (((Linha-Ln1 =:= 1, Linha2 is Linha-1, ((Coluna-Cn1=:=2, Coluna2 is Coluna-1); (Coluna-Cn1 =:= -2, Coluna2 is Coluna+1)));
-	   (Linha-Ln1 =:= -1, Linha2 is Linha+1, ((Coluna-Cn1=:=2, Coluna2 is Coluna-1); (Coluna-Cn1 =:= -2, Coluna2 is Coluna+1))));
-	  ((Linha-Ln1 =:= 2, Linha2 is Linha-1, ((Coluna-Cn1=:=1, Coluna2 is Coluna-1); (Coluna-Cn1 =:= -1, Coluna2 is Coluna+1)));
-	   (Linha-Ln1 =:= -2, Linha2 is Linha+1, ((Coluna-Cn1=:=1, Coluna2 is Coluna-1); (Coluna-Cn1 =:= -1, Coluna2 is Coluna+1))))),
-	 caminho_squire(Ln1,Linha,Cn1,Coluna,Tab,Lis1,Caminho_Squire)).
+	 ((Linha-Ln1 =:= 1, Linha2 is Linha-1, ((Coluna-Cn1=:=2, Coluna2 is Coluna-1); (Coluna-Cn1 =:= -2, Coluna2 is Coluna+1)));
+	  (Linha-Ln1 =:= -1, Linha2 is Linha+1, ((Coluna-Cn1=:=2, Coluna2 is Coluna-1); (Coluna-Cn1 =:= -2, Coluna2 is Coluna+1)));
+	  (Linha-Ln1 =:= 2, Linha2 is Linha-1, ((Coluna-Cn1=:=1, Coluna2 is Coluna-1); (Coluna-Cn1 =:= -1, Coluna2 is Coluna+1)));
+	  (Linha-Ln1 =:= -2, Linha2 is Linha+1, ((Coluna-Cn1=:=1, Coluna2 is Coluna-1); (Coluna-Cn1 =:= -1, Coluna2 is Coluna+1)))),
+	 caminho_squire(Ln1,Linha2,Cn1,Coluna2,Tab,Lis1,Caminho_Squire)).
 
 jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2,Tab):-
 	(Ln1\=Ln2; Cn1\=Cn2), caminho(Ln1,Cn1,Ln2,Cn2,Tab,Caminho),
-	(move_valida_king(Peca,Ln1,Cn1,Ln2,Cn2,Caminho);
-	 move_valida_mountedmen(Peca,Ln1,Cn1,Ln2,Cn2,Caminho);
-	 move_valida_sergeants(Peca,Ln1,Cn1,Ln2,Cn2,Caminho);
-	 move_valida_pikemen(Peca,Ln1,Cn1,Ln2,Cn2,Caminho);
-	 move_valida_squire(Peca,Ln1,Cn1,Ln2,Cn2,Tab);
-	 move_valida_archer(Peca,Ln1,Cn1,Ln2,Cn2,Caminho)).
+	 (move_valida_king(Peca,Ln1,Cn1,Ln2,Cn2,Caminho);
+	  move_valida_mountedmen(Peca,Ln1,Cn1,Ln2,Cn2,Caminho);
+	  move_valida_sergeants(Peca,Ln1,Cn1,Ln2,Cn2,Caminho);
+	  move_valida_pikemen(Peca,Ln1,Cn1,Ln2,Cn2,Caminho);
+	  move_valida_squire(Peca,Ln1,Cn1,Ln2,Cn2,Caminho);
+	  move_valida_archer(Peca,Ln1,Cn1,Ln2,Cn2,Caminho)).
 
 
 move_valida_king(Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
 	((Peca==aK; Peca==bK), \+member(x,Caminho)),
-	 (
-	  (Ln1==Ln2, abs(Cn1-Cn2)=<2);
+	 ((Ln1==Ln2, abs(Cn1-Cn2)=<2);
 	  (Cn1==Cn2, abs(Ln1-Ln2)=<2);
-	  (abs(Ln1-Ln2)=<2,abs(Ln1-Ln2)=:=abs(Cn1-Cn2))
-	 ).
+	  (abs(Ln1-Ln2)=<2,abs(Ln1-Ln2)=:=abs(Cn1-Cn2))).
 
 
 move_valida_mountedmen(Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
 	(mountedmen(MountedMen), member(Peca,MountedMen), \+member(x,Caminho), \+member(t,Caminho)),
-	 (
-	  (Ln1==Ln2;Cn1==Cn2);
-	  (abs(Ln1-Ln2)=:=abs(Cn1-Cn2))
-	 ).
+	 ((Ln1==Ln2;Cn1==Cn2);
+	  (abs(Ln1-Ln2)=:=abs(Cn1-Cn2)) ).
 
 
 move_valida_sergeants(Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
 	((Peca==aS; peca==bS), \+member(x,Caminho)),
-	 (
-	  (Ln1==Ln2, abs(Cn1-Cn2)=:=1);
+	 ((Ln1==Ln2, abs(Cn1-Cn2)=:=1);
 	  (Cn1==Cn2, abs(Ln1-Ln2)=:=1);
-	  (abs(Ln1-Ln2)=<12, abs(Ln1-Ln2)=:=abs(Cn1-Cn2))
-	 ).
+	  (abs(Ln1-Ln2)=<12, abs(Ln1-Ln2)=:=abs(Cn1-Cn2))).
 
 
 move_valida_pikemen(Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
         ((Peca==ap; Peca==bp), \+member(x,Caminho)),
-	 (
-	  (Ln1==Ln2, abs(Cn1-Cn2)=<12);
+	 ((Ln1==Ln2, abs(Cn1-Cn2)=<12);
 	  (Cn1==Cn2, abs(Ln1-Ln2)=<12);
-	  (abs(Ln1-Ln2)=:=1, abs(Cn1-Cn2)=:=1)
-         ).
+	  (abs(Ln1-Ln2)=:=1, abs(Cn1-Cn2)=:=1)).
 
 
-move_valida_squire(Peca,Ln1,Cn1,Ln2,Cn2,Tab):-
-	((Peca==as; Peca==bs), caminho_squire(Ln1,Cn1,Ln2,Cn2,Tab,[],Caminho), \+member(x,Caminho)),
-	 (
-	  (abs(Ln1-Ln2)=:=1, abs(Cn1-Cn2)=:=2);
-	  (abs(Ln1-Ln2)=:=2, abs(Cn1-Cn2)=:=1)
-	 ).
+move_valida_squire(Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
+	((Peca==as; Peca==bs), write(Caminho),\+member(x,Caminho)),
+	 ((abs(Ln1-Ln2)=:=1, abs(Cn1-Cn2)=:=2);
+	  (abs(Ln1-Ln2)=:=2, abs(Cn1-Cn2)=:=1)).
 
 %%	%%%%%%%%%%%%falta implementar o caso de shoot enemy
 move_valida_archer(Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
-	((Peca==aa; Peca==ba), \+member(x,Caminho)),
+	((Peca==aa; Peca==ba), \+member(x,Caminho),write(Caminho)),
 	 (  %%%%%falta caso de shoot enemy
 	  (Ln1==Ln2, abs(Cn1-Cn2)=<3);
 	  (Cn1==Cn2, abs(Ln1-Ln2)=<3);
-	  (abs(Ln1-Ln2)=<3, abs(Ln1-Ln2)=:=abs(Cn1-Cn2))
-	 ).
+	  (abs(Ln1-Ln2)=<3, abs(Ln1-Ln2)=:=abs(Cn1-Cn2))).
 
 
 /*
