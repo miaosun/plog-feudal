@@ -54,7 +54,7 @@ comeca_jogo(Op):-    %para efeito de teste, ainda não est?implementado
 	%insere_todas_peca(j2,Hand2,Tab1,Tab2),!, clear(50),
 
 	estadoTeste(Tab2),
-	jogador_jogador(j1,Tab2),!;
+	jogador_jogador(j1,Tab2,_),!;
 
 	Op == 2, write('\nMode: Humano contra Computador\n'),nl, menu_nivel,!;
 	Op == 3, write('\nMode: Computador contra Computador\n'),nl, menu_nivel.
@@ -191,28 +191,31 @@ mover_mais_pecas(J,N,Jf):-
 	 N1 is N-1, mover_mais_pecas(J,N1,Jf)).
 
 
-jogador_jogador(J,Tab):-   %%%%%%%%%ainda tem que ser ver melhor a construcao deste predicado!!!!!!!!!
+jogador_jogador(J,Tab,Tabf):-   %%%%%%%%%ainda tem que ser ver melhor a construcao deste predicado!!!!!!!!!
 	%(   game_over(Tab), write('Obrigado por jogar!'),nl);
 
-	pecas_J1(Pecas_J1), pecas_J2(Pecas_J2),
-	length(Pecas_J1,Size_P_J1), length(Pecas_J2,Size_P_J2),
+%	pecas_J1(Pecas_J1), pecas_J2(Pecas_J2),
+%	length(Pecas_J1,Size_P_J1), length(Pecas_J2,Size_P_J2),
 	%length serve para determinar o maximo movimentos cada jogadr pode fazer em cada jogada
-	jogar(J,Tab,Tabf),
+	jogar(J,Tab,Tabf).
 
-	vez_jogador(J,Tabf),
-
-	((J==j1, mover_mais_pecas(j1,Size_P_J1,Jf));
-	 (J==j2, mover_mais_pecas(j2,Size_P_J2,Jf))),
+%	vez_jogador(J,Tabf),
+%
+%	((J==j1, mover_mais_pecas(j1,Size_P_J1,Jf));
+%	 (J==j2, mover_mais_pecas(j2,Size_P_J2,Jf))),
 
 	%falta proceder movimentos,colocacoes...
 
-	jogador_jogador(Jf,Tabf).
+%	jogador_jogador(Jf,Tabf).
 
 
 
 jogar(J,Tab,Tabf):-
         vez_jogador(J,Tab),nl,
         print_legenda,
+
+	pecas_J1(Pecas_J1), pecas_J2(Pecas_J2),
+	length(Pecas_J1,Size_P_J1), length(Pecas_J2,Size_P_J2),
 
 	write('Escolhe a posicao da Peca pretende mover'),nl,
         repeat,
@@ -226,10 +229,47 @@ jogar(J,Tab,Tabf):-
 	    (write('Coluna: '), read(Cn2), coluna_valida(Cn2))),!,
 
 	get_peca_do_tab(J,Ln1,Cn1,Tab,Peca),
+	get_peca_do_tab(J,Ln2,Cn2,Tab,Casa),
 
 	((jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2),remover_do_tab(Ln1,Cn1,Tab,Tab1),
-	  insere_peca_no_tab(Peca,Ln2,Cn2,Tab1,Tabf),nl);
+	  insere_peca_no_tab(Peca,Ln2,Cn2,Tab1,Tab2),nl,vez_jogador(J,Tab2),
+	  ((J==j1, mover_mais_pecas(j1,Size_P_J1,Jf));
+	   (J==j2, mover_mais_pecas(j2,Size_P_J2,Jf))), jogar(Jf,Tab2,Tabf));
 	 nl, write('Movimento nao valido, tenta novamente!'),nl,sleep(1),clear(10),jogar(J,Tab,Tabf)).
+
+
+%cria uma lista de caminho
+caminho(Ln1,Cn1,Ln2,Cn2,Tab,Caminho):-
+	(Ln1==Ln2, caminho_coluna(Ln1,Cn1,Cn2,Tab,[],Caminho));
+	(Cn1==Cn2, caminho_linha(Ln1,Ln2,Cn1,Tab,[],Caminho));
+	(abs(Ln1-Ln2)=:=abs(Cn1-Cn2), caminho_diagonal(Ln1,Ln2,Cn1,Cn2,Tab,[],Caminho)).
+
+
+%cria uma lista de caminho em coluna
+caminho_coluna(Ln1,Cn1,Coluna,Tab,Lis,Caminho_Coluna):-
+	(Coluna==Cn1, Caminho_Coluna=Lis,!);
+	(get_peca_do_tab(_,Ln1,Coluna,Tab,Peca),
+	 append([Peca],Lis,Lis1),
+	 ((Coluna>Cn1,Coluna2 is Coluna-1);(Coluna<Cn1, Coluna2 is Coluna+1)),
+	 caminho_coluna(Ln1,Cn1,Coluna2,Tab,Lis1,Caminho_Coluna)).
+
+%cria uma lista de caminho em linha
+caminho_linha(Ln1,Linha,Cn1,Tab,Lis,Caminho_Linha):-
+	(Linha==Ln1, Caminho_Linha=Lis,!);
+	(get_peca_do_tab(_,Linha,Cn1,Tab,Peca),
+	 append([Peca],Lis,Lis1),
+	 ((Linha>Ln1, Linha2 is Linha-1); (Linha<Ln1, Linha2 is Linha+1)),
+	 caminho_linha(Ln1,Linha2,Cn1,Tab,Lis1,Caminho_Linha)).
+
+%cria uma lista de caminho em diagonal
+caminho_diagonal(Ln1,Linha,Cn1,Coluna,Tab,Lis,Caminho_Diagonal):-
+	(Linha==Ln1,Coluna==Cn1, Caminho_Diagonal=Lis,!);
+	(get_peca_do_tab(_,Linha,Coluna,Tab,Peca),
+	 append([Peca],Lis,Lis1),
+	 ((Linha>Ln1, Linha2 is Linha-1, ((Coluna>Cn1, Coluna2 is Coluna-1); (Coluna<Cn1, Coluna2 is Coluna+1)));
+	  (Linha<Ln1, Linha2 is Linha+1, ((Coluna>Cn1, Coluna2 is Coluna-1); (Coluna<Cn1, Coluna2 is Coluna+1)))),
+	 caminho_diagonal(Ln1,Linha2,Cn1,Coluna2,Tab,Lis1,Caminho_Diagonal)).
+
 
 
 jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2):-
@@ -387,22 +427,4 @@ peca_esta_no_tab(Peca,Tab):-
 	(   member(Sublista,Tab), member(Peca,Sublista)),!;
 	fail.
 
-
-
-
-
-lista([1,2,3,4,5]).
-test:-
-	lista(Lis),
-	vez(1,Lis).
-
-vez(_,[]):-write('acabou'),!.
-vez(N,Lis):-
-	remove_at(Lis,1,_,Lis2),
-	(
-	 (N==1, N1 is N-1);
-	 (N==0, N1 is N+1)
-	),!,
-	write(Lis2),nl,write(N1),nl,
-	vez(N1,Lis2).
 
