@@ -231,7 +231,7 @@ jogar(J,Tab,Tabf):-
 	get_peca_do_tab(J,Ln1,Cn1,Tab,Peca),
 	get_peca_do_tab(J,Ln2,Cn2,Tab,Casa),
 
-	((jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2),remover_do_tab(Ln1,Cn1,Tab,Tab1),
+	((jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2,Tab),remover_do_tab(Ln1,Cn1,Tab,Tab1),
 	  insere_peca_no_tab(Peca,Ln2,Cn2,Tab1,Tab2),nl,vez_jogador(J,Tab2),
 	  ((J==j1, mover_mais_pecas(j1,Size_P_J1,Jf));
 	   (J==j2, mover_mais_pecas(j2,Size_P_J2,Jf))), jogar(Jf,Tab2,Tabf));
@@ -272,36 +272,35 @@ caminho_diagonal(Ln1,Linha,Cn1,Coluna,Tab,Lis,Caminho_Diagonal):-
 
 
 
-jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2):-
-	(Ln1\=Ln2; Cn1\=Cn2),
-	(move_valida_king(Peca,Ln1,Cn1,Ln2,Cn2);
-	 move_valida_mountedmen(Peca,Ln1,Cn1,Ln2,Cn2);
-	 move_valida_sergeants(Peca,Ln1,Cn1,Ln2,Cn2);
-	 move_valida_pikemen(Peca,Ln1,Cn1,Ln2,Cn2);
-	 move_valida_squire(Peca,Ln1,Cn1,Ln2,Cn2);
-	 move_valida_archer(Peca,Ln1,Cn1,Ln2,Cn2)).
+jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2,Tab):-
+	(Ln1\=Ln2; Cn1\=Cn2), caminho(Ln1,Cn1,Ln2,Cn2,Tab,Caminho),
+	(move_valida_king(Peca,Ln1,Cn1,Ln2,Cn2,Caminho);
+	 move_valida_mountedmen(Peca,Ln1,Cn1,Ln2,Cn2,Caminho);
+	 move_valida_sergeants(Peca,Ln1,Cn1,Ln2,Cn2,Caminho);
+	 move_valida_pikemen(Peca,Ln1,Cn1,Ln2,Cn2,Caminho);
+	 move_valida_squire(Peca,Ln1,Cn1,Ln2,Cn2,Caminho);
+	 move_valida_archer(Peca,Ln1,Cn1,Ln2,Cn2,Caminho)).
 
 
-move_valida_king(Peca,Ln1,Cn1,Ln2,Cn2):-
-	(Peca==aK; Peca==bK),
-	(      %%%%%falta mountanha e torreino
-	 (Ln1==Ln2, abs(Cn1-Cn2)=<2);
-	 (Cn1==Cn2, abs(Ln1-Ln2)=<2);
-	 (abs(Ln1-Ln2)=<2,abs(Ln1-Ln2)=:=abs(Cn1-Cn2))
-	).
+move_valida_king(Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
+	((Peca==aK; Peca==bK), \+member(x,Caminho)),
+	 (
+	  (Ln1==Ln2, abs(Cn1-Cn2)=<2);
+	  (Cn1==Cn2, abs(Ln1-Ln2)=<2);
+	  (abs(Ln1-Ln2)=<2,abs(Ln1-Ln2)=:=abs(Cn1-Cn2))
+	 ).
 
 
-% VALIDAR QUE NAO PASSA POR MONTANHAS OU TERRENO
-move_valida_mountedmen(Peca,Ln1,Cn1,Ln2,Cn2):-
-	mountedmen(MountedMen), member(Peca,MountedMen),
-	(  %%%%falta mountanha e torreino
-	 (Ln1==Ln2;Cn1==Cn2);
-	 (abs(Ln1-Ln2)=:=abs(Cn1-Cn2))
-	).
+move_valida_mountedmen(Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
+	(mountedmen(MountedMen), member(Peca,MountedMen), \+member(x,Caminho), \+member(t,Caminho)),
+	 (
+	  (Ln1==Ln2;Cn1==Cn2);
+	  (abs(Ln1-Ln2)=:=abs(Cn1-Cn2))
+	 ).
 
 
-move_valida_sergeants(Peca,Ln1,Cn1,Ln2,Cn2):-
-	(Peca==aS; peca==bS),
+move_valida_sergeants(Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
+	((Peca==aS; peca==bS), \+member(x,Caminho)),
 	 (  %%%%%falta mountanha e terreno
 	  (Ln1==Ln2, abs(Cn1-Cn2)=:=1);
 	  (Cn1==Cn2, abs(Ln1-Ln2)=:=1);
@@ -309,26 +308,26 @@ move_valida_sergeants(Peca,Ln1,Cn1,Ln2,Cn2):-
 	 ).
 
 
-move_valida_pikemen(Peca,Ln1,Cn1,Ln2,Cn2):-
-        (Peca==ap; Peca==bp),
+move_valida_pikemen(Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
+        ((Peca==ap; Peca==bp), \+member(x,Caminho)),
 	 (   %%%%%falta mountanha e torreino
 	  (Ln1==Ln2, abs(Cn1-Cn2)=<12);
 	  (Cn1==Cn2, abs(Ln1-Ln2)=<12);
 	  (abs(Ln1-Ln2)=:=1, abs(Cn1-Cn2)=:=1)
          ).
 
-
-move_valida_squire(Peca,Ln1,Cn1,Ln2,Cn2):-
+%%	%%%%caminho especial, falta para implementar................
+move_valida_squire(Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
 	(Peca==as; Peca==bs),
 	 (  %%%%%%falta mountanha e torreino
 	  (abs(Ln1-Ln2)=:=1, abs(Cn1-Cn2)=:=2);
 	  (abs(Ln1-Ln2)=:=2, abs(Cn1-Cn2)=:=1)
 	 ).
 
-
-move_valida_archer(Peca,Ln1,Cn1,Ln2,Cn2):-
-	(Peca==aa; Peca==ba),
-	 (  %%%%%falta mountanha e torreino, e caso de shoot enemy
+%%	%%%%%%%%%%%%falta implementar o caso de shoot enemy
+move_valida_archer(Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
+	((Peca==aa; Peca==ba), \+member(x,Caminho)),
+	 (  %%%%%falta caso de shoot enemy
 	  (Ln1==Ln2, abs(Cn1-Cn2)=<3);
 	  (Cn1==Cn2, abs(Ln1-Ln2)=<3);
 	  (abs(Ln1-Ln2)=<3, abs(Ln1-Ln2)=:=abs(Cn1-Cn2))
