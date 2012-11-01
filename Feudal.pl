@@ -231,7 +231,8 @@ jogar(J,Tab,Tabf):-
 	get_peca_do_tab(J,Ln1,Cn1,Tab,Peca),
 	get_peca_do_tab(J,Ln2,Cn2,Tab,Casa),
 
-	((jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2,Tab),remover_do_tab(Ln1,Cn1,Tab,Tab1),
+	(((J==j1, \+member(Casa,Pecas_J1)); (J==j2, \+member(Casa,Pecas_J2))),
+	 (jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2,Tab),remover_do_tab(Ln1,Cn1,Tab,Tab1),
 	  insere_peca_no_tab(Peca,Ln2,Cn2,Tab1,Tab2),nl,vez_jogador(J,Tab2),
 	  ((J==j1, mover_mais_pecas(j1,Size_P_J1,Jf));
 	   (J==j2, mover_mais_pecas(j2,Size_P_J2,Jf))), jogar(Jf,Tab2,Tabf));
@@ -270,7 +271,15 @@ caminho_diagonal(Ln1,Linha,Cn1,Coluna,Tab,Lis,Caminho_Diagonal):-
 	  (Linha<Ln1, Linha2 is Linha+1, ((Coluna>Cn1, Coluna2 is Coluna-1); (Coluna<Cn1, Coluna2 is Coluna+1)))),
 	 caminho_diagonal(Ln1,Linha2,Cn1,Coluna2,Tab,Lis1,Caminho_Diagonal)).
 
-
+caminho_squire(Ln1,Linha,Cn1,Coluna,Tab,Lis,Caminho_Squire):-
+	(abs(Linha-Ln1)=:=1, abs(Coluna-Cn1)=:=1, Caminho_Squire=Lis),
+	(get_peca_do_tab(_,Linha,Coluna,Tab,Peca),
+	 append([Peca],Lis,Lis1),
+	 (((Linha-Ln1 =:= 1, Linha2 is Linha-1, ((Coluna-Cn1=:=2, Coluna2 is Coluna-1); (Coluna-Cn1 =:= -2, Coluna2 is Coluna+1)));
+	   (Linha-Ln1 =:= -1, Linha2 is Linha+1, ((Coluna-Cn1=:=2, Coluna2 is Coluna-1); (Coluna-Cn1 =:= -2, Coluna2 is Coluna+1))));
+	  ((Linha-Ln1 =:= 2, Linha2 is Linha-1, ((Coluna-Cn1=:=1, Coluna2 is Coluna-1); (Coluna-Cn1 =:= -1, Coluna2 is Coluna+1)));
+	   (Linha-Ln1 =:= -2, Linha2 is Linha+1, ((Coluna-Cn1=:=1, Coluna2 is Coluna-1); (Coluna-Cn1 =:= -1, Coluna2 is Coluna+1))))),
+	 caminho_squire(Ln1,Linha,Cn1,Coluna,Tab,Lis1,Caminho_Squire)).
 
 jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2,Tab):-
 	(Ln1\=Ln2; Cn1\=Cn2), caminho(Ln1,Cn1,Ln2,Cn2,Tab,Caminho),
@@ -278,7 +287,7 @@ jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2,Tab):-
 	 move_valida_mountedmen(Peca,Ln1,Cn1,Ln2,Cn2,Caminho);
 	 move_valida_sergeants(Peca,Ln1,Cn1,Ln2,Cn2,Caminho);
 	 move_valida_pikemen(Peca,Ln1,Cn1,Ln2,Cn2,Caminho);
-	 move_valida_squire(Peca,Ln1,Cn1,Ln2,Cn2,Caminho);
+	 move_valida_squire(Peca,Ln1,Cn1,Ln2,Cn2,Tab);
 	 move_valida_archer(Peca,Ln1,Cn1,Ln2,Cn2,Caminho)).
 
 
@@ -301,7 +310,7 @@ move_valida_mountedmen(Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
 
 move_valida_sergeants(Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
 	((Peca==aS; peca==bS), \+member(x,Caminho)),
-	 (  %%%%%falta mountanha e terreno
+	 (
 	  (Ln1==Ln2, abs(Cn1-Cn2)=:=1);
 	  (Cn1==Cn2, abs(Ln1-Ln2)=:=1);
 	  (abs(Ln1-Ln2)=<12, abs(Ln1-Ln2)=:=abs(Cn1-Cn2))
@@ -310,16 +319,16 @@ move_valida_sergeants(Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
 
 move_valida_pikemen(Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
         ((Peca==ap; Peca==bp), \+member(x,Caminho)),
-	 (   %%%%%falta mountanha e torreino
+	 (
 	  (Ln1==Ln2, abs(Cn1-Cn2)=<12);
 	  (Cn1==Cn2, abs(Ln1-Ln2)=<12);
 	  (abs(Ln1-Ln2)=:=1, abs(Cn1-Cn2)=:=1)
          ).
 
-%%	%%%%caminho especial, falta para implementar................
-move_valida_squire(Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
-	(Peca==as; Peca==bs),
-	 (  %%%%%%falta mountanha e torreino
+
+move_valida_squire(Peca,Ln1,Cn1,Ln2,Cn2,Tab):-
+	((Peca==as; Peca==bs), caminho_squire(Ln1,Cn1,Ln2,Cn2,Tab,[],Caminho), \+member(x,Caminho)),
+	 (
 	  (abs(Ln1-Ln2)=:=1, abs(Cn1-Cn2)=:=2);
 	  (abs(Ln1-Ln2)=:=2, abs(Cn1-Cn2)=:=1)
 	 ).
