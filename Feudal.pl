@@ -23,7 +23,7 @@ clear(N):- N1 is N-1, nl, !,clear(N1).
 
 %para o utilizador saber que simbolo corresponde que peca
 print_legenda:-
-	write('Legenda:'),nl,
+	write('Legenda:'), tab(9),write('** - Mountains,   ## - Rough Terrain'),nl,
 	tab(3),write('C - Castle,   G - Green,	 K - King,    P - Prince,  D - Duke'),nl,
 	tab(3),write('k - Knights,  S - Sergeants,  s - Squire,  a - Archer,  p - Pikemen'), nl,nl.
 
@@ -294,10 +294,10 @@ jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2,Tab):-
 
 
 move_valida_king(Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
-	((Peca==aK; Peca==bK), \+member(x,Caminho)),
-	 ((Ln1==Ln2, abs(Cn1-Cn2)=<2);
-	  (Cn1==Cn2, abs(Ln1-Ln2)=<2);
-	  (abs(Ln1-Ln2)=<2,abs(Ln1-Ln2)=:=abs(Cn1-Cn2))).
+	(Peca==aK; Peca==bK), \+member(x,Caminho),
+	((Ln1==Ln2, abs(Cn1-Cn2)=<2);
+	 (Cn1==Cn2, abs(Ln1-Ln2)=<2);
+	 (abs(Ln1-Ln2)=<2,abs(Ln1-Ln2)=:=abs(Cn1-Cn2))).
 
 
 move_valida_mountedmen(Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
@@ -307,31 +307,31 @@ move_valida_mountedmen(Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
 
 
 move_valida_sergeants(Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
-	((Peca==aS; peca==bS), \+member(x,Caminho)),
-	 ((Ln1==Ln2, abs(Cn1-Cn2)=:=1);
-	  (Cn1==Cn2, abs(Ln1-Ln2)=:=1);
-	  (abs(Ln1-Ln2)=<12, abs(Ln1-Ln2)=:=abs(Cn1-Cn2))).
+	(Peca==aS; peca==bS), \+member(x,Caminho),
+	((Ln1==Ln2, abs(Cn1-Cn2)=:=1);
+	 (Cn1==Cn2, abs(Ln1-Ln2)=:=1);
+	 (abs(Ln1-Ln2)=<12, abs(Ln1-Ln2)=:=abs(Cn1-Cn2))).
 
 
 move_valida_pikemen(Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
-        ((Peca==ap; Peca==bp), \+member(x,Caminho)),
-	 ((Ln1==Ln2, abs(Cn1-Cn2)=<12);
-	  (Cn1==Cn2, abs(Ln1-Ln2)=<12);
-	  (abs(Ln1-Ln2)=:=1, abs(Cn1-Cn2)=:=1)).
+        (Peca==ap; Peca==bp), \+member(x,Caminho),
+	((Ln1==Ln2, abs(Cn1-Cn2)=<12);
+	 (Cn1==Cn2, abs(Ln1-Ln2)=<12);
+	 (abs(Ln1-Ln2)=:=1, abs(Cn1-Cn2)=:=1)).
 
 
 move_valida_squire(Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
-	((Peca==as; Peca==bs), \+member(x,Caminho)),
-	 ((abs(Ln1-Ln2)=:=1, abs(Cn1-Cn2)=:=2);
-	  (abs(Ln1-Ln2)=:=2, abs(Cn1-Cn2)=:=1)).
+	(Peca==as; Peca==bs), \+member(x,Caminho),
+	((abs(Ln1-Ln2)=:=1, abs(Cn1-Cn2)=:=2);
+	 (abs(Ln1-Ln2)=:=2, abs(Cn1-Cn2)=:=1)).
 
 %%	%%%%%%%%%%%%falta implementar o caso de shoot enemy
 move_valida_archer(Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
-	((Peca==aa; Peca==ba), \+member(x,Caminho)),
-	 (  %%%%%falta caso de shoot enemy
-	  (Ln1==Ln2, abs(Cn1-Cn2)=<3);
-	  (Cn1==Cn2, abs(Ln1-Ln2)=<3);
-	  (abs(Ln1-Ln2)=<3, abs(Ln1-Ln2)=:=abs(Cn1-Cn2))).
+	(Peca==aa; Peca==ba), \+member(x,Caminho),
+	(  %%%%%falta caso de shoot enemy
+	 (Ln1==Ln2, abs(Cn1-Cn2)=<3);
+	 (Cn1==Cn2, abs(Ln1-Ln2)=<3);
+	 (abs(Ln1-Ln2)=<3, abs(Ln1-Ln2)=:=abs(Cn1-Cn2))).
 
 
 /*

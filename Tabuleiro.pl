@@ -103,8 +103,8 @@ printList([FElem|OElem]):-
 
 draw_casa(Elem):-  %desenha a casa com os valores respectivmente
 	Elem == 0,  write('  ');
-	Elem == x,  write('##');
-	Elem == t,  write('**');
+	Elem == x,  write('**');
+	Elem == t,  write('##');
 	Elem == aC, write('1C');
 	Elem == aG, write('1G');
 	Elem == aK, write('1K');
