@@ -191,7 +191,7 @@ mover_mais_pecas(J,Jf):-
 
 
 jogador_jogador(J,Tab,Tabf):-   %%%%%%%%%ainda tem que ser ver melhor a construcao deste predicado!!!!!!!!!
-	%(   game_over(Tab), write('Obrigado por jogar!'),nl);
+
 
 %	pecas_J1(Pecas_J1), pecas_J2(Pecas_J2),
 %	length(Pecas_J1,Size_P_J1), length(Pecas_J2,Size_P_J2),
@@ -209,7 +209,9 @@ jogador_jogador(J,Tab,Tabf):-   %%%%%%%%%ainda tem que ser ver melhor a construc
 
 
 jogar(J,Tab,Tabf):-
-        vez_jogador(J,Tab),nl,
+       (game_over(Tab), write('Obrigado por jogar!'),nl);
+
+	vez_jogador(J,Tab),nl,
         print_legenda,
 
 	pecas_J1(Pecas_J1), pecas_J2(Pecas_J2),
@@ -228,15 +230,17 @@ jogar(J,Tab,Tabf):-
 	get_peca_do_tab(J,Ln1,Cn1,Tab,Peca),
 	get_peca_do_tab(J,Ln2,Cn2,Tab,Casa),
 
-	(((J==j1, \+member(Casa,Pecas_J1)); (J==j2, \+member(Casa,Pecas_J2))), %verifica se a posicao destino é uma peca do jogador
-	 (jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2,Tab), %verifica se o movimento da peca é valido
+	( ((J==j1, \+member(Casa,Pecas_J1)); (J==j2, \+member(Casa,Pecas_J2))), %verifica se a posicao destino é uma peca do jogador
+	  (jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2,Tab), %verifica se o movimento da peca é valido
 	  remover_do_tab(Ln1,Cn1,Tab,Tab1), %tira a peca da posicao origin fica uma casa vazia
 	  insere_peca_no_tab(Peca,Ln2,Cn2,Tab1,Tab2), %coloca a peca origin na posicao destino
-	  nl,vez_jogador(J,Tab2),
-	  ((J==j1, mover_mais_pecas(j1,Jf));
-	   (J==j2, mover_mais_pecas(j2,Jf))),
-	  jogar(Jf,Tab2,Tabf));
-	 nl, write('Movimento nao valido, tenta novamente!'),nl,sleep(1),clear(10),jogar(J,Tab,Tabf)).
+	  (nl,vez_jogador(J,Tab2),
+	   ((game_over(Tab2), write('Obrigado por jogar!'),nl);
+	    ((J==j1, mover_mais_pecas(j1,Jf));
+	    (J==j2, mover_mais_pecas(j2,Jf))),
+	     jogar(Jf,Tab2,Tabf))
+	  );
+	 nl, write('Movimento nao valido, tenta novamente!'),nl,sleep(1),clear(10),jogar(J,Tab,Tabf))).
 
 
 %cria uma lista de caminho
@@ -334,20 +338,15 @@ move_valida_archer(Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
 	 (abs(Ln1-Ln2)=<3, abs(Ln1-Ln2)=:=abs(Cn1-Cn2))).
 
 
-/*
 
 game_over(Tab):-
-	member(Linhas,Tab),
-	((   \+peca_esta_no_tab(aC,Tab),write(test1);
-	 (   \+peca_esta_no_tab(aK,Tab), \+peca_esta_no_tab(aP,Tab), \+peca_esta_no_tab(aD,Tab))
+	((\+peca_esta_no_tab(aC,Tab);
+	 (\+peca_esta_no_tab(aK,Tab), \+peca_esta_no_tab(aP,Tab), \+peca_esta_no_tab(aD,Tab))
 	), write('Game over, o Jogador 2 ganhou')),nl,!;
 
-	member(Linhas,Tab),
-	((   \+peca_esta_no_tab(bC,Tab),write(test1);
-	 (   \+peca_esta_no_tab(bK,Tab), peca_esta_no_tab(bP,Tab), peca_esta_no_tab(bD,Tab))
+	((\+peca_esta_no_tab(bC,Tab);
+	 (\+peca_esta_no_tab(bK,Tab), \+peca_esta_no_tab(bP,Tab), \+peca_esta_no_tab(bD,Tab))
 	), write('Game over, o Jogador 1 ganhou')),nl,!.
-*/
-%member(Linhas,Tab),member(Peca,Linhas) nao funciona!!
 
 
 
