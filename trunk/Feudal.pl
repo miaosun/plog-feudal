@@ -184,7 +184,7 @@ coluna_valida(Cn):-
 %mover_mais_pecas(J,3,Jf):-trocar_vez(J,Jf),!.
 mover_mais_pecas(J,Jf):-
 	write('Pretende mover mais Pecas? (1: Sim | 2: Nao)'),nl,
-	read(Op),
+	write('Opcao: '),read(Op),
 	((integer(Op),((Op==1,Jf=J); (Op==2, trocar_vez(J,Jf))));
 	 write('Opcao invalida, tenta novamente!'),nl,
 	 mover_mais_pecas(J,Jf)).
@@ -273,7 +273,8 @@ caminho_diagonal(Ln1,Linha,Cn1,Coluna,Tab,Lis,Caminho_Diagonal):-
 	 caminho_diagonal(Ln1,Linha2,Cn1,Coluna2,Tab,Lis1,Caminho_Diagonal)).
 
 caminho_squire(Ln1,Linha,Cn1,Coluna,Tab,Lis,Caminho_Squire):-
-	(( (abs(Linha-Ln1)=:=1,Coluna==Cn1); (Linha==Ln1,abs(Coluna-Cn1)=:=1)), Caminho_Squire=Lis,!);
+	(((abs(Linha-Ln1)=:=1,Coluna==Cn1); (Linha==Ln1,abs(Coluna-Cn1)=:=1)),
+	  get_peca_do_tab(_,Linha,Coluna,Tab,Peca), append([Peca],Lis,Caminho_Squire),!);
 	(get_peca_do_tab(_,Linha,Coluna,Tab,Peca),
 	 append([Peca],Lis,Lis1),
 	 ((Linha-Ln1 =:= 1, Linha2 is Linha-1, ((Coluna-Cn1=:=2, Coluna2 is Coluna-1); (Coluna-Cn1 =:= -2, Coluna2 is Coluna+1)));
@@ -283,7 +284,7 @@ caminho_squire(Ln1,Linha,Cn1,Coluna,Tab,Lis,Caminho_Squire):-
 	 caminho_squire(Ln1,Linha2,Cn1,Coluna2,Tab,Lis1,Caminho_Squire)).
 
 jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2,Tab):-
-	(Ln1\=Ln2; Cn1\=Cn2), caminho(Ln1,Cn1,Ln2,Cn2,Tab,Caminho),
+	(Ln1\=Ln2; Cn1\=Cn2), caminho(Ln1,Cn1,Ln2,Cn2,Tab,Caminho),!,write(Caminho),write(' hello '),
 	 (move_valida_king(Peca,Ln1,Cn1,Ln2,Cn2,Caminho);
 	  move_valida_mountedmen(Peca,Ln1,Cn1,Ln2,Cn2,Caminho);
 	  move_valida_sergeants(Peca,Ln1,Cn1,Ln2,Cn2,Caminho);
@@ -320,13 +321,13 @@ move_valida_pikemen(Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
 
 
 move_valida_squire(Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
-	((Peca==as; Peca==bs), write(Caminho),\+member(x,Caminho)),
+	((Peca==as; Peca==bs), \+member(x,Caminho)),
 	 ((abs(Ln1-Ln2)=:=1, abs(Cn1-Cn2)=:=2);
 	  (abs(Ln1-Ln2)=:=2, abs(Cn1-Cn2)=:=1)).
 
 %%	%%%%%%%%%%%%falta implementar o caso de shoot enemy
 move_valida_archer(Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
-	((Peca==aa; Peca==ba), \+member(x,Caminho),write(Caminho)),
+	((Peca==aa; Peca==ba), \+member(x,Caminho)),
 	 (  %%%%%falta caso de shoot enemy
 	  (Ln1==Ln2, abs(Cn1-Cn2)=<3);
 	  (Cn1==Cn2, abs(Ln1-Ln2)=<3);
