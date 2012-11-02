@@ -9,6 +9,9 @@
 
 :-compile('Tabuleiro.pl').
 
+:- dynamic posicao_aG/2.
+:- dynamic posicao_bG/2.
+
 start:-
 	welcome,
 	menu_start.
@@ -192,7 +195,8 @@ mover_mais_pecas(J,Jf):-
 
 jogador_jogador(J,Tab,Tabf):-   %%%%%%%%%ainda tem que ser ver melhor a construcao deste predicado!!!!!!!!!
 
-
+       % get_peca_do_tab(j1,Ln1,Cn1,Tab,aG), assert(posicao_aG(Ln1,Cn1)),
+       % get_peca_do_tab(j2,Ln2,Cn2,Tab,bG), assert(posicao_bG(Ln2,Cn2)),
 %	pecas_J1(Pecas_J1), pecas_J2(Pecas_J2),
 %	length(Pecas_J1,Size_P_J1), length(Pecas_J2,Size_P_J2),
 	%length serve para determinar o maximo movimentos cada jogadr pode fazer em cada jogada
@@ -288,7 +292,7 @@ caminho_squire(Ln1,Linha,Cn1,Coluna,Tab,Lis,Caminho_Squire):-
 	 caminho_squire(Ln1,Linha2,Cn1,Coluna2,Tab,Lis1,Caminho_Squire)).
 
 jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2,Tab):-
-	(Ln1\=Ln2; Cn1\=Cn2), caminho(Ln1,Cn1,Ln2,Cn2,Tab,Caminho),!,write(Caminho),write(' hello '),
+	(Ln1\=Ln2; Cn1\=Cn2), caminho(Ln1,Cn1,Ln2,Cn2,Tab,Caminho), move_valida_aux(Caminho),!,
 	 (move_valida_king(Peca,Ln1,Cn1,Ln2,Cn2,Caminho);
 	  move_valida_mountedmen(Peca,Ln1,Cn1,Ln2,Cn2,Caminho);
 	  move_valida_sergeants(Peca,Ln1,Cn1,Ln2,Cn2,Caminho);
@@ -337,7 +341,12 @@ move_valida_archer(Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
 	 (Cn1==Cn2, abs(Ln1-Ln2)=<3);
 	 (abs(Ln1-Ln2)=<3, abs(Ln1-Ln2)=:=abs(Cn1-Cn2))).
 
-
+%ve se no meio caminho sao existe alguma peca
+move_valida_aux(Caminho):-
+	pecas_J1(Pecas_J1), pecas_J2(Pecas_J2),
+	length(Caminho,Size_Caminho),
+	remove_at(Caminho,Size_Caminho,_,Meio),
+	member(Casa_Meio,Meio), \+member(Casa_Meio,Pecas_J1), \+member(Casa_Meio,Pecas_J2).
 
 game_over(Tab):-
 	((\+peca_esta_no_tab(aC,Tab);
