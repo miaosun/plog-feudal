@@ -232,7 +232,7 @@ jogar(J,Tab,Tabf,Lpos):-
 	  (verifica_green(J,Casa,Tab),jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2,Tab), %verifica se o movimento da peca é valido
 	  remover_do_tab(Ln1,Cn1,Tab,Tab1), %tira a peca da posicao origin fica uma casa vazia
 	  insere_peca_no_tab(Peca,Ln2,Cn2,Tab1,Tab2), %coloca a peca origin na posicao destino
-	  (nl,/*posicoes_alteradas(Ln2,Cn2,Lpos,Lpos2),*/ vez_jogador(J,Tab2),
+	  (nl,posicoes_alteradas(Ln2,Cn2,Lpos,Lpos2), vez_jogador(J,Tab2),
 	   ((game_over(Tab2), write('Obrigado por jogar!'),nl);
 
 	    (mover_mais_pecas(J,Jf,Lpos2,Lpos3),
@@ -241,10 +241,9 @@ jogar(J,Tab,Tabf,Lpos):-
 	 nl, write('Movimento nao valido, tenta novamente!'),nl,sleep(1),clear(10),jogar(J,Tab,Tabf,Lpos))).
 
 verifica_green(J,Casa,Tab):-
-	(Casa\=aC; Casa\=bC);
+	(Casa\=aC, Casa\=bC);
 	((J==j1, Casa==bC,(\+peca_esta_no_tab(bG,Tab); write('Tem que se primeiro entrar a Green para entrar o Castle'),fail,!));
 	(J==j2, Casa==aC, (\+peca_esta_no_tab(aG,Tab); write('Tem que se primeiro entrar a Green para entrar o Castle'),fail,!))).
-
 
 
 %lista com posições alteradas em cada jogada
