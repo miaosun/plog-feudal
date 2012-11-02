@@ -185,12 +185,16 @@ coluna_valida(Cn):-
 
 %um jogador no maximo pode mover 13 pecas em cada jogada
 %mover_mais_pecas(J,3,Jf):-trocar_vez(J,Jf),!.
-mover_mais_pecas(J,Jf,Lpos):-
+mover_mais_pecas(J,Jf,Lpos,Lpos3):-
 	write('Pretende mover mais Pecas? (1: Sim | 2: Nao)'),nl,
 	write('Opcao: '),read(Op),
-	((integer(Op),((Op==1,Jf=J); (Op==2, trocar_vez(J,Jf)),Lpos=[]));
+	((integer(Op),((Op==1,Jf=J,copy(Lpos,Lpos3)); (Op==2, trocar_vez(J,Jf)),delete(Lpos,_,Lpos3)));
 	 write('Opcao invalida, tenta novamente!'),nl,
-	 mover_mais_pecas(J,Jf,Lpos)).
+	 mover_mais_pecas(J,Jf,Lpos,Lpos3)).
+
+copy(L,R) :- accCp(L,R).
+accCp([],[]).
+accCp([H|T1],[H|T2]) :- accCp(T1,T2).
 
 
 jogador_jogador(J,Tab,Tabf):-   %%%%%%%%%ainda tem que ser ver melhor a construcao deste predicado!!!!!!!!!
@@ -227,13 +231,12 @@ jogar(J,Tab,Tabf,Lpos):-
 	   jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2,Tab), %verifica se o movimento da peca é valido
 	  remover_do_tab(Ln1,Cn1,Tab,Tab1), %tira a peca da posicao origin fica uma casa vazia
 	  insere_peca_no_tab(Peca,Ln2,Cn2,Tab1,Tab2), %coloca a peca origin na posicao destino
-	  (nl,posicoes_alteradas(Ln2,Cn2,Lpos,Lpos2), /*Lpos=Lpos2,*/ vez_jogador(J,Tab2),
+	  (nl,posicoes_alteradas(Ln2,Cn2,Lpos,Lpos2), vez_jogador(J,Tab2),
 	   ((game_over(Tab2), write('Obrigado por jogar!'),nl);
-	    (mover_mais_pecas(J,Jf,Lpos)),
-	     jogar(Jf,Tab2,Tabf,Lpos))
+	    (mover_mais_pecas(J,Jf,Lpos2,Lpos3)),
+	     jogar(Jf,Tab2,Tabf,Lpos3))
 	  );
 	 nl, write('Movimento nao valido, tenta novamente!'),nl,sleep(1),clear(10),jogar(J,Tab,Tabf,Lpos))).
-
 
 
 %lista com posições alteradas em cada jogada
