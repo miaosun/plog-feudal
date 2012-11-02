@@ -195,19 +195,7 @@ mover_mais_pecas(J,Jf):-
 
 jogador_jogador(J,Tab,Tabf):-   %%%%%%%%%ainda tem que ser ver melhor a construcao deste predicado!!!!!!!!!
 
-       % get_peca_do_tab(j1,Ln1,Cn1,Tab,aG), assert(posicao_aG(Ln1,Cn1)),
-       % get_peca_do_tab(j2,Ln2,Cn2,Tab,bG), assert(posicao_bG(Ln2,Cn2)),
-%	pecas_J1(Pecas_J1), pecas_J2(Pecas_J2),
-%	length(Pecas_J1,Size_P_J1), length(Pecas_J2,Size_P_J2),
-	%length serve para determinar o maximo movimentos cada jogadr pode fazer em cada jogada
 	jogar(J,Tab,Tabf).
-
-%	vez_jogador(J,Tabf),
-%
-%	((J==j1, mover_mais_pecas(j1,Size_P_J1,Jf));
-%	 (J==j2, mover_mais_pecas(j2,Size_P_J2,Jf))),
-
-	%falta proceder movimentos,colocacoes...
 
 %	jogador_jogador(Jf,Tabf).
 
@@ -342,11 +330,17 @@ move_valida_archer(Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
 	 (abs(Ln1-Ln2)=<3, abs(Ln1-Ln2)=:=abs(Cn1-Cn2))).
 
 %ve se no meio caminho sao existe alguma peca
+
+move_valida_aux([_]):-!.
 move_valida_aux(Caminho):-
 	pecas_J1(Pecas_J1), pecas_J2(Pecas_J2),
 	length(Caminho,Size_Caminho),
 	remove_at(Caminho,Size_Caminho,_,Meio),
-	member(Casa_Meio,Meio), \+member(Casa_Meio,Pecas_J1), \+member(Casa_Meio,Pecas_J2).
+	reverse(Meio,Meio2), cabeca(Casa_Meio,Meio2),
+	\+member(Casa_Meio,Pecas_J1), \+member(Casa_Meio,Pecas_J2),
+	move_valida_aux(Meio).
+
+cabeca(H,[H|_]):-!.
 
 game_over(Tab):-
 	((\+peca_esta_no_tab(aC,Tab);
