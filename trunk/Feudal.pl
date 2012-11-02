@@ -220,30 +220,63 @@ jogar(J,Tab,Tabf,Lpos):-
 	     sem_repeticoes(Ln1,Cn1,Lpos),!
 	)),nl,nl,
 
-        write('Escolhe a posicao do destino'),nl,
-        repeat,
-        (   (repeat, (write('Linha: '), read(Ln2), linha_valida(Ln2))),
-	    (write('Coluna: '), read(Cn2), coluna_valida(Cn2))),!,
+      get_peca_do_tab(J,Ln1,Cn1,Tab,Peca),
+      opcao_archer(Peca,Opcao),!,
+      (
+        (
+         (Opcao==no; Opcao==1),
+         write('Escolhe a posicao do destino'),nl,
+         repeat,
+         (   (repeat, (write('Linha: '), read(Ln2), linha_valida(Ln2))),
+	     (write('Coluna: '), read(Cn2), coluna_valida(Cn2))),!,
 
-	get_peca_do_tab(J,Ln1,Cn1,Tab,Peca),
-	get_peca_do_tab(J,Ln2,Cn2,Tab,Casa),
+	 get_peca_do_tab(J,Ln2,Cn2,Tab,Casa),
 
-	( ((J==j1, \+member(Casa,Pecas_J1)); (J==j2, \+member(Casa,Pecas_J2))), %verifica se a posicao destino é uma peca do jogador
-	  (verifica_green(J,Casa,Tab),jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2,Tab), %verifica se o movimento da peca é valido
-	  remover_do_tab(Ln1,Cn1,Tab,Tab1), %tira a peca da posicao origin fica uma casa vazia
-	  insere_peca_no_tab(Peca,Ln2,Cn2,Tab1,Tab2), %coloca a peca origin na posicao destino
-	  (nl,posicoes_alteradas(Ln2,Cn2,Lpos,Lpos2), vez_jogador(J,Tab2),
-	   ((game_over(Tab2), write('Obrigado por jogar!'),nl);
+	 ( ( ((J==j1, \+member(Casa,Pecas_J1));(J==j2, \+member(Casa,Pecas_J2))), %verifica se a posicao destino é uma peca do jogador
+	    verifica_green(J,Casa,Tab),
+	    jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2,Tab), %verifica se o movimento da peca é valido
+	    remover_do_tab(Ln1,Cn1,Tab,Tab1), %tira a peca da posicao origin fica uma casa vazia
+	    insere_peca_no_tab(Peca,Ln2,Cn2,Tab1,Tab2), %coloca a peca origin na posicao destino
+	    nl,posicoes_alteradas(Ln2,Cn2,Lpos,Lpos2), vez_jogador(J,Tab2),
+	    ((game_over(Tab2), write('Obrigado por jogar!'),nl);
+	     (mover_mais_pecas(J,Jf,Lpos2,Lpos3),
+	      jogar(Jf,Tab2,Tabf,Lpos3)))
+	   );
+	   (nl, write('Movimento nao valido, tenta novamente!'),nl,sleep(1),clear(10),jogar(J,Tab,Tabf,Lpos)))
+        );
 
-	    (mover_mais_pecas(J,Jf,Lpos2,Lpos3),
-	     jogar(Jf,Tab2,Tabf,Lpos3)))
-	  );
-	 nl, write('Movimento nao valido, tenta novamente!'),nl,sleep(1),clear(10),jogar(J,Tab,Tabf,Lpos))).
+        (
+	 Opcao==2,
+	 write('Escolhe a posicao pretende atacar'),nl,
+         repeat,
+         (   (repeat, (write('Linha: '), read(Ln2), linha_valida(Ln2))),
+	     (write('Coluna: '), read(Cn2), coluna_valida(Cn2))),!,
+
+	 get_peca_do_tab(J,Ln2,Cn2,Tab,Casa),
+
+	 ( ( ((J==j1, member(Casa,Pecas_J2)); (J==j2, member(Casa,Pecas_J1))),
+	     verifica_green(J,Casa,Tab),jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2,Tab),
+	     remover_do_tab(Ln2,Cn2,Tab,Tab2),
+	     nl,posicoes_alteradas(Ln1,Cn1,Lpos,Lpos2), vez_jogador(J,Tab2),
+	     ((game_over(Tab2), write('Obrigado por jogar!'),nl);
+	      (mover_mais_pecas(J,Jf,Lpos2,Lpos3),
+	       jogar(Jf,Tab2,Tabf,Lpos3)))
+	   );
+	   (nl, write('Movimento nao valido, ou nao tem peca para atacar nessa posicao, tenta novamente!'),nl,sleep(1),clear(10),jogar(J,Tab,Tabf,Lpos)))
+	)
+      ).
+
+opcao_archer(Peca,Opcao):-
+	(Peca\=aa, Peca\=ba, Opcao=no);
+	((write('Pretende mover ou atacar? (1: Mover | 2: Atacar)'),nl, write('Opcao: '), read(Op)),
+	 (((Op==1;Op==2), Opcao=Op);
+	 (write('Opcao invalida, tenta novamente!'),nl, opcao_archer(Peca,Opcao)))).
+
 
 verifica_green(J,Casa,Tab):-
 	(Casa\=aC, Casa\=bC);
 	((J==j1, Casa==bC,(\+peca_esta_no_tab(bG,Tab); write('Tem que se primeiro entrar a Green para entrar o Castle'),fail,!));
-	(J==j2, Casa==aC, (\+peca_esta_no_tab(aG,Tab); write('Tem que se primeiro entrar a Green para entrar o Castle'),fail,!))).
+	 (J==j2, Casa==aC, (\+peca_esta_no_tab(aG,Tab); write('Tem que se primeiro entrar a Green para entrar o Castle'),fail,!))).
 
 
 %lista com posições alteradas em cada jogada
