@@ -104,12 +104,12 @@ colocacao_valida(J,Peca,Ln,Cn,Tab):-
 	(
 	 (J==j1,
 	    ((Peca==aC, ((PecaTab\=aG, \+peca_esta_no_tab(aG,Tab)); member(aG,LisV)));
-	     (Peca==aG, ((PecaTab\=aC, \+peca_esta_no_tab(aC,Tab)); member(aC,LisV)));
+	     (Peca==aG, ((PecaTab\=aC, \+peca_esta_no_tab(aC,Tab)); member(aC,LisV)),assert(posicao_aG(Ln,Cn)));
 	     (Peca\=aC, Peca\=aG, Casa==0)) ),!;
 
 	 (J==j2,
             ((Peca==bC, ((PecaTab\=bG, \+peca_esta_no_tab(bG,Tab)); member(bG,LisV)));
-	     (Peca==bG, ((PecaTab\=bC, \+peca_esta_no_tab(bC,Tab)); member(bC,LisV)));
+	     (Peca==bG, ((PecaTab\=bC, \+peca_esta_no_tab(bC,Tab)); member(bC,LisV)),assert(posicao_bG(Ln,Cn)));
 	     (Peca\=bC, Peca\=bG, Casa==0)) ),!;
 
 	 (write('Jogada nao valida, tenta novamente!'),!,nl,fail)
