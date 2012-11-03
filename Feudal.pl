@@ -221,10 +221,10 @@ jogar(J,Tab,Tabf,Lpos):-
 	)),nl,nl,
 
       get_peca_do_tab(J,Ln1,Cn1,Tab,Peca),
-      opcao_archer(Peca,Opcao),!,
+      opcao_archer(Peca,Opcao),!,  %se a peca nao foi Archer, passa a frente
       (
         (
-	 Opcao==2,
+	 Opcao==2,  %quando escolher para atacar
 	 write('Escolhe a posicao pretende atacar'),nl,
          repeat,
          (   (repeat, (write('Linha: '), read(Ln2), linha_valida(Ln2))),
@@ -234,8 +234,8 @@ jogar(J,Tab,Tabf,Lpos):-
 
 	 ( ( ((J==j1, member(Casa,Pecas_J2)); (J==j2, member(Casa,Pecas_J1))),
 	     verifica_green(J,Casa,Tab),jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2,Tab),
-	     remover_do_tab(Ln2,Cn2,Tab,Tab2),
-	     nl,posicoes_alteradas(Ln1,Cn1,Lpos,Lpos2), vez_jogador(J,Tab2),
+	     remover_do_tab(Ln2,Cn2,Tab,Tab2), %remove a peca doutro jogador qual foi atacada pela Archer
+	     nl,posicoes_alteradas(Ln1,Cn1,Lpos,Lpos2), vez_jogador(J,Tab2), %guarda a posicao de Archer, nao pode jogar mais com Archer nesse seria de jogadas
 	     ((game_over(Tab2), write('Obrigado por jogar!'),nl);
 	      (mover_mais_pecas(J,Jf,Lpos2,Lpos3),
 	       jogar(Jf,Tab2,Tabf,Lpos3)))
@@ -244,7 +244,7 @@ jogar(J,Tab,Tabf,Lpos):-
 	);
 
        (
-         % (Opcao==no; Opcao==1),
+          %quando escolher para movimentar, ou quando a peca nao foi Archer
           write('Escolhe a posicao do destino'),nl,
           repeat,
           (   (repeat, (write('Linha: '), read(Ln2), linha_valida(Ln2))),
@@ -257,8 +257,8 @@ jogar(J,Tab,Tabf,Lpos):-
 	     jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2,Tab),
 
 	     archer_aux(Casa,Pecas_J1,Pecas_J2,Opcao,Saida),
-	     ((Saida=yes,remover_do_tab(Ln1,Cn1,Tab,Tab1));
-	      fail),
+	     ((Saida=yes,remover_do_tab(Ln1,Cn1,Tab,Tab1));  %quando foi um movimento valida, para Archer e outras pecas
+	      fail), %quando tiver peca na casa destina, pois Archer so pode atacar com os tiros, nao pode movimentar a atacar
 
 	     insere_peca_no_tab(Peca,Ln2,Cn2,Tab1,Tab2),
 	     nl,posicoes_alteradas(Ln2,Cn2,Lpos,Lpos2), vez_jogador(J,Tab2),
@@ -270,11 +270,14 @@ jogar(J,Tab,Tabf,Lpos):-
          )
       ).
 
+%auxiliar para ver se a posicao onde a peca Archer quer movimentar e uma casa com uma peca doutro jogador,
+%se tiver nao permite mover, pois Archer so pode atacar com os tiros
 archer_aux(_,_,_,no,Saida):-Saida=yes.
 archer_aux(Casa,Pecas_J1,Pecas_J2,1,Saida):-
 	(\+member(Casa,Pecas_J1), \+member(Casa,Pecas_J2), Saida=yes);
 	((write('Archer so pode atacar com os tiros, tenta novamente!'),nl, fail)).
 
+%a peca Archer tem 2 possiveis jogadas, movimentar ou atacar
 opcao_archer(Peca,Opcao):-
 	(Peca\=aa, Peca\=ba, Opcao=no);
 	((write('Pretende mover ou atacar? (1: Mover | 2: Atacar)'),nl, write('Opcao: '), read(Op)),
@@ -282,6 +285,7 @@ opcao_archer(Peca,Opcao):-
 	 (write('Opcao invalida, tenta novamente!'),nl, opcao_archer(Peca,Opcao)))).
 
 
+%so permite a entrada ao castelo doutro jogador quando tiver entrada no Green doutro jogador
 verifica_green(J,Casa,Tab):-
 	(Casa\=aC, Casa\=bC);
 	((J==j1, Casa==bC,(\+peca_esta_no_tab(bG,Tab); write('Tem que se primeiro entrar a Green para entrar o Castle'),fail,!));
@@ -292,6 +296,7 @@ verifica_green(J,Casa,Tab):-
 posicoes_alteradas(Ln,Cn,List,List2):-
 	append([[Ln,Cn]],List,List2).
 
+%cada jogador numa seria de jogadas pode movimentar varias pecas, mas cada peca so pode ser movimentada uma vez
 sem_repeticoes(Ln,Cn,List):-
 	\+member([Ln,Cn],List);
 	write('A peca ja foi movimentada, tenta novamenta!'), nl, fail.
@@ -330,6 +335,7 @@ caminho_diagonal(Ln1,Linha,Cn1,Coluna,Tab,Lis,Caminho_Diagonal):-
 	  (Linha<Ln1, Linha2 is Linha+1, ((Coluna>Cn1, Coluna2 is Coluna-1); (Coluna<Cn1, Coluna2 is Coluna+1)))),
 	 caminho_diagonal(Ln1,Linha2,Cn1,Coluna2,Tab,Lis1,Caminho_Diagonal)).
 
+%cria uma lista de caminho especiais da peca Squire
 caminho_squire(Ln1,Linha,Cn1,Coluna,Tab,Lis,Caminho_Squire):-
 	(((abs(Linha-Ln1)=:=1,Coluna==Cn1); (Linha==Ln1,abs(Coluna-Cn1)=:=1)),
 	  get_peca_do_tab(_,Linha,Coluna,Tab,Peca), append([Peca],Lis,Caminho_Squire),!);
@@ -341,6 +347,7 @@ caminho_squire(Ln1,Linha,Cn1,Coluna,Tab,Lis,Caminho_Squire):-
 	  (Linha-Ln1 =:= -2, Linha2 is Linha+1, ((Coluna-Cn1=:=1, Coluna2 is Coluna-1); (Coluna-Cn1 =:= -1, Coluna2 is Coluna+1)))),
 	 caminho_squire(Ln1,Linha2,Cn1,Coluna2,Tab,Lis1,Caminho_Squire)).
 
+%verifica se uma determinada jogada e valida
 jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2,Tab):-
 	(Ln1\=Ln2; Cn1\=Cn2), caminho(Ln1,Cn1,Ln2,Cn2,Tab,Caminho), move_valida_aux(Caminho),!,
 	 (move_valida_king(Peca,Ln1,Cn1,Ln2,Cn2,Caminho);
@@ -350,40 +357,40 @@ jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2,Tab):-
 	  move_valida_squire(Peca,Ln1,Cn1,Ln2,Cn2,Caminho);
 	  move_valida_archer(Peca,Ln1,Cn1,Ln2,Cn2,Caminho)).
 
-
+%verifica se o movimento da peca King e valida
 move_valida_king(Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
 	(Peca==aK; Peca==bK), \+member(x,Caminho),
 	((Ln1==Ln2, abs(Cn1-Cn2)=<2);
 	 (Cn1==Cn2, abs(Ln1-Ln2)=<2);
 	 (abs(Ln1-Ln2)=<2,abs(Ln1-Ln2)=:=abs(Cn1-Cn2))).
 
-
+%verifica se o movimento das peca Mountedmen e valida
 move_valida_mountedmen(Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
 	(mountedmen(MountedMen), member(Peca,MountedMen), \+member(x,Caminho), \+member(t,Caminho)),
 	 ((Ln1==Ln2;Cn1==Cn2);
 	  (abs(Ln1-Ln2)=:=abs(Cn1-Cn2)) ).
 
-
+%verifica se o movimento da peca Sergeamt e valida
 move_valida_sergeants(Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
 	(Peca==aS; peca==bS), \+member(x,Caminho),
 	((Ln1==Ln2, abs(Cn1-Cn2)=:=1);
 	 (Cn1==Cn2, abs(Ln1-Ln2)=:=1);
 	 (abs(Ln1-Ln2)=<12, abs(Ln1-Ln2)=:=abs(Cn1-Cn2))).
 
-
+%verifica se o movimento da peca Pikemen e valida
 move_valida_pikemen(Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
         (Peca==ap; Peca==bp), \+member(x,Caminho),
 	((Ln1==Ln2, abs(Cn1-Cn2)=<12);
 	 (Cn1==Cn2, abs(Ln1-Ln2)=<12);
 	 (abs(Ln1-Ln2)=:=1, abs(Cn1-Cn2)=:=1)).
 
-
+%verifica se o movimento da peca Squire e valida
 move_valida_squire(Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
 	(Peca==as; Peca==bs), \+member(x,Caminho),
 	((abs(Ln1-Ln2)=:=1, abs(Cn1-Cn2)=:=2);
 	 (abs(Ln1-Ln2)=:=2, abs(Cn1-Cn2)=:=1)).
 
-%%	%%%%%%%%%%%%falta implementar o caso de shoot enemy
+%verifica se o movimento da peca Archer e valida
 move_valida_archer(Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
 	(Peca==aa; Peca==ba), \+member(x,Caminho),
 	(  %%%%%falta caso de shoot enemy
@@ -391,8 +398,8 @@ move_valida_archer(Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
 	 (Cn1==Cn2, abs(Ln1-Ln2)=<3);
 	 (abs(Ln1-Ln2)=<3, abs(Ln1-Ln2)=:=abs(Cn1-Cn2))).
 
-%ve se no meio caminho sao existe alguma peca
 
+%ve se no meio caminho entre 2 posicoes tem alguma pecas, se tiver o movimento nao e valido, pois nao se pode ultrapassar outra peca
 move_valida_aux([_]):-!.
 move_valida_aux(Caminho):-
 	pecas_J1(Pecas_J1), pecas_J2(Pecas_J2),
@@ -404,6 +411,7 @@ move_valida_aux(Caminho):-
 
 cabeca(H,[H|_]).
 
+%condicao de terminacao do jogo
 game_over(Tab):-
 	((\+peca_esta_no_tab(aC,Tab);
 	 (\+peca_esta_no_tab(aK,Tab), \+peca_esta_no_tab(aP,Tab), \+peca_esta_no_tab(aD,Tab))
@@ -414,7 +422,7 @@ game_over(Tab):-
 	), write('Game over, o Jogador 1 ganhou')),nl,!.
 
 
-
+%cada jogador so pode movimentar as suas pecas, mas nao pode movimentar as pecas Castle e Green
 permite_mover(J,Ln,Cn,Tab,Peca):-
 	pecas_J1(Pecas_J1),
 	pecas_J2(Pecas_J2),
@@ -439,7 +447,7 @@ faz_opcao(Op):-
 
 
 
-%LisV - Lista dos vizinhos
+%LisV - Lista dos vizinhos, serve para restringir a peca Green so pode ser colocada ao lado da Castle, vice versa
 vizinhos(J,Ln,Cn,Tab,LisV):-
 
 	LnMais  is Ln+1,
