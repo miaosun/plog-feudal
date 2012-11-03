@@ -56,7 +56,7 @@ comeca_jogo(Op):-    %para efeito de teste, ainda não est?implementado
 	%insere_todas_peca(j1,Hand1,Tab,Tab1),!, clear(50),
 	%insere_todas_peca(j2,Hand2,Tab1,Tab2),!, clear(50),
 
-	estadoTeste(Tab2),
+	estadoTeste2(Tab2),
 	jogador_jogador(j1,Tab2,_),!;
 
 	Op == 2, write('\nMode: Humano contra Computador\n'),nl, menu_nivel,!;
