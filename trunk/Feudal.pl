@@ -224,28 +224,6 @@ jogar(J,Tab,Tabf,Lpos):-
       opcao_archer(Peca,Opcao),!,
       (
         (
-         (Opcao==no; Opcao==1),
-         write('Escolhe a posicao do destino'),nl,
-         repeat,
-         (   (repeat, (write('Linha: '), read(Ln2), linha_valida(Ln2))),
-	     (write('Coluna: '), read(Cn2), coluna_valida(Cn2))),!,
-
-	 get_peca_do_tab(J,Ln2,Cn2,Tab,Casa),
-
-	 ( ( ((J==j1, \+member(Casa,Pecas_J1));(J==j2, \+member(Casa,Pecas_J2))), %verifica se a posicao destino é uma peca do jogador
-	    verifica_green(J,Casa,Tab),
-	    jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2,Tab), %verifica se o movimento da peca é valido
-	    remover_do_tab(Ln1,Cn1,Tab,Tab1), %tira a peca da posicao origin fica uma casa vazia
-	    insere_peca_no_tab(Peca,Ln2,Cn2,Tab1,Tab2), %coloca a peca origin na posicao destino
-	    nl,posicoes_alteradas(Ln2,Cn2,Lpos,Lpos2), vez_jogador(J,Tab2),
-	    ((game_over(Tab2), write('Obrigado por jogar!'),nl);
-	     (mover_mais_pecas(J,Jf,Lpos2,Lpos3),
-	      jogar(Jf,Tab2,Tabf,Lpos3)))
-	   );
-	   (nl, write('Movimento nao valido, tenta novamente!'),nl,sleep(1),clear(10),jogar(J,Tab,Tabf,Lpos)))
-        );
-
-        (
 	 Opcao==2,
 	 write('Escolhe a posicao pretende atacar'),nl,
          repeat,
@@ -262,9 +240,40 @@ jogar(J,Tab,Tabf,Lpos):-
 	      (mover_mais_pecas(J,Jf,Lpos2,Lpos3),
 	       jogar(Jf,Tab2,Tabf,Lpos3)))
 	   );
-	   (nl, write('Movimento nao valido, ou nao tem peca para atacar nessa posicao, tenta novamente!'),nl,sleep(1),clear(10),jogar(J,Tab,Tabf,Lpos)))
-	)
+	   (nl, write('Opcao invalida, tenta novamente!'),nl,sleep(1),clear(10),jogar(J,Tab,Tabf,Lpos)))
+	);
+
+       (
+         % (Opcao==no; Opcao==1),
+          write('Escolhe a posicao do destino'),nl,
+          repeat,
+          (   (repeat, (write('Linha: '), read(Ln2), linha_valida(Ln2))),
+	      (write('Coluna: '), read(Cn2), coluna_valida(Cn2))),!,
+
+	  get_peca_do_tab(J,Ln2,Cn2,Tab,Casa),
+
+	  ( ( ((J==j1, \+member(Casa,Pecas_J1));(J==j2, \+member(Casa,Pecas_J2))), %verifica se a posicao destino é uma peca do jogador
+	     verifica_green(J,Casa,Tab),
+	     jogada_valida(Peca,Ln1,Cn1,Ln2,Cn2,Tab),
+
+	     archer_aux(Casa,Pecas_J1,Pecas_J2,Opcao,Saida),
+	     ((Saida=yes,remover_do_tab(Ln1,Cn1,Tab,Tab1));
+	      fail),
+
+	     insere_peca_no_tab(Peca,Ln2,Cn2,Tab1,Tab2),
+	     nl,posicoes_alteradas(Ln2,Cn2,Lpos,Lpos2), vez_jogador(J,Tab2),
+	     ((game_over(Tab2), write('Obrigado por jogar!'),nl);
+	      (mover_mais_pecas(J,Jf,Lpos2,Lpos3),
+	       jogar(Jf,Tab2,Tabf,Lpos3)))
+	    );
+	    (nl, write('Movimento nao valido, tenta novamente!'),nl,sleep(1),clear(10),jogar(J,Tab,Tabf,Lpos)))
+         )
       ).
+
+archer_aux(_,_,_,no,Saida):-Saida=yes.
+archer_aux(Casa,Pecas_J1,Pecas_J2,1,Saida):-
+	(\+member(Casa,Pecas_J1), \+member(Casa,Pecas_J2), Saida=yes);
+	((write('Archer so pode atacar com os tiros, tenta novamente!'),nl, fail)).
 
 opcao_archer(Peca,Opcao):-
 	(Peca\=aa, Peca\=ba, Opcao=no);
