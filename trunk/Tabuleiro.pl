@@ -28,6 +28,9 @@
 % ba - Archer    x1
 % bp - Pikemen   x4
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%	         Definicao das pecas e dos jogadores                %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 mountedmen([aP,aD,ak, bP,bD,bk]).
 footmen([aK,aS,as,aa,ap, bK,bS,bs,ba,bp]).
@@ -47,6 +50,11 @@ trocar_vez_pc(pc,j1).
 trocar_vez_pcs(pc1,pc2).
 trocar_vez_pcs(pc2,pc1).
 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                  Estado inicial do tabuleiro                    %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%  Estado inicial  %%%%%%%%
 estadoInicial([[x,0,0,0,0,0,0,0,0,x,x,0,0,0,0,0,0,0,0,0,0,0,0,x],
@@ -75,9 +83,11 @@ estadoInicial([[x,0,0,0,0,0,0,0,0,x,x,0,0,0,0,0,0,0,0,0,0,0,0,x],
                [x,0,0,0,0,t,x,0,0,0,0,0,0,0,0,0,0,x,x,0,0,0,0,x]]).
 
 
-%limpa a ecra com N linhas
-clear(0):-!.
-clear(N):- N1 is N-1, nl, !,clear(N1).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%	             Visualizacao dos Menus                      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %para o utilizador saber que simbolo corresponde que peca
 print_legenda:-
@@ -106,16 +116,12 @@ menu_start:-
 	comeca_jogo(Op).
 
 
-%funcao auxiliar para verificar se a opcao do utilizador e valida
-opcao_invalida(Op):-
-	Op \== 1, Op \== 2, Op \== 3.
 
-%procede a opcao do utilizador
-faz_opcao(Op):-
-	read(Op),
-	\+opcao_invalida(Op),!;
-	writeln('opcao invalida, tenta novamente'), write('Opcao: '), faz_opcao(Op),!.
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%	             Visualizacao do tabuleiro                     %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %mostra o tabuleiro e as coordenadas respectivemente
 print_tab(Tab):-
@@ -148,7 +154,8 @@ printList([FElem|OElem]):-
                         printList(OElem).
 
 
-draw_casa(Elem):-  %desenha a casa com os valores respectivmente
+%desenha a casa com os valores respectivmente
+draw_casa(Elem):-
 	Elem == 0,  write('  ');
 	Elem == x,  write('**');
 	Elem == t,  write('##');
@@ -172,25 +179,6 @@ draw_casa(Elem):-  %desenha a casa com os valores respectivmente
 	Elem == bs, write('2s');
 	Elem == ba, write('2a');
 	Elem == bp, write('2p').
-
-
-
-
-menu_nivel:-
-	write('**********************************'),nl,
-        write('*                                *'),nl,
-        write('*         Nivel do Jogo          *'),nl,
-        write('*                                *'),nl,
-        write('*            1.Easy              *'),nl,
-        write('*           2.Normal             *'),nl,
-        write('*            3.Hard              *'),nl,
-        write('*                                *'),nl,
-        write('**********************************'),nl,nl,
-	write('Opcao: '), faz_opcao(_Op),!.
-	%write(Op), integer(Op),writeln(' um numero').
-
-
-
 
 
 
@@ -279,3 +267,5 @@ estado_inPC([[x,0,0,0,0,0,0,0,0,x,x,0,0,0,0,0,0,0,0,0,0,0,0,x],
              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
              [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
              [x,0,0,0,0,t,x,0,0,0,0,0,0,0,0,0,0,x,x,0,0,0,0,x]]).
+
+
