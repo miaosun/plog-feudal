@@ -62,10 +62,10 @@ insere_todas_pecas(J,Hand,Tab,Tabf,Lis,Pos_PC):-
 	  (random(1,Aux,P), write(P),nl,remove_at(Hand,P,Peca,Hand2)),
 
 	  repeat,
-	  ((repeat, (write('Linha: '), ((J==pc1,random(1,13,Ln)); random(13,25,Ln)), write(Ln),nl,linha_valida_inserir(J,Ln))),
-	   (write('Coluna: '), random(1,25,Cn), write(Cn),nl, coluna_valida(Cn)),
-	    colocacao_valida(J,Peca,Ln,Cn,Tab), append([[Ln,Cn]],Lis,Acc)
-	  ),!,
+	  ((repeat, ((J==pc1,random(1,13,Ln)); random(13,25,Ln)), linha_valida_inserir(J,Ln)),
+	   (random(1,25,Cn), coluna_valida(Cn)),
+	    colocacao_valida(J,Peca,Ln,Cn,Tab),	write('Linha: '),write(Ln),nl, write('Coluna: '),write(Cn),nl,
+	    append([[Ln,Cn]],Lis,Acc) ),!,
 
 	  sleep(1),insere_peca_no_tab(Peca,Ln,Cn,Tab,Tab1), insere_todas_pecas(J,Hand2,Tab1,Tabf,Acc,Pos_PC)
 	 );   % operacao para jogador PC
@@ -102,7 +102,7 @@ colocacao_valida(J,Peca,Ln,Cn,Tab):-
 	     (Peca==bG, ((PecaTab\=bC, \+peca_esta_no_tab(bC,Tab)); member(bC,LisV)),assert(posicao_bG(Ln,Cn)));
 	     (Peca\=bC, Peca\=bG, Casa==0)) ),!;
 
-	 (write('Jogada nao valida, tenta novamente!'),!,nl,fail)
+	 ( ((J==j1;J==j2),(write('Jogada nao valida, tenta novamente!')),!,nl,fail); fail)
 	).
 
 
@@ -158,7 +158,7 @@ remove_at([Y|Xs],N,Peca,[Y|Ys]) :- N > 1,
 linha_valida_inserir(J,Ln):-
 	((J==j1;J==pc1), Ln>=1,  Ln=<12),!;
 	((J==j2;J==pc;J==pc2), Ln>=13, Ln=<24),!;
-	write('Linha invalida, tenta novamente!'),nl,fail.
+	(((J==j1;J==j2),write('Linha invalida, tenta novamente!'),nl,fail); fail).
 
 linha_valida(Ln):-
 	Ln>=1, Ln=<24,!;
@@ -261,7 +261,7 @@ jogador_computador(J,Tab,Tabf,Pos_PC):-
 
 	   ( ( \+member(Casa,Pecas_J2),verifica_green(J,Casa,Tab), delete(Pos_PC,[Ln1,Cn1],Pos_PC_aux),
 	      remover_do_tab(Ln1,Cn1,Tab,Tab1),insere_peca_no_tab(Peca,Ln2,Cn2,Tab1,Tab2),nl, append([Ln2,Cn2],Pos_PC_aux, Pos_PC_f),
-	      ((game_over(J,Tab2), write('Obrigado por jogar!'),nl);
+	      ((game_over(J,Tab2),vez_jogador(J,Tab2), write('Obrigado por jogar!'),nl);
 	       (trocar_vez_pc(J,Jf),jogador_computador(Jf,Tab2,Tabf,Pos_PC_f)))
 	     );
 	     (nl, write('Movimento nao valido, tenta novamente!'),nl,sleep(1),clear(10),jogador_computador(J,Tab,Tabf,Pos_PC)) ) )
@@ -283,7 +283,7 @@ jogador_computador(J,Tab,Tabf,Pos_PC):-
 
 	   ( (\+member(Casa,Pecas_J1),verifica_green(J,Casa,Tab),jogada_valida(J,Peca,Ln1,Cn1,Ln2,Cn2,Tab),
 	      remover_do_tab(Ln1,Cn1,Tab,Tab1),insere_peca_no_tab(Peca,Ln2,Cn2,Tab1,Tab2),nl,
-	      ((game_over(J,Tab2), write('Obrigado por jogar!'),nl);
+	      ((game_over(J,Tab2), vez_jogador(J,Tab2),write('Obrigado por jogar!'),nl);
 	       (trocar_vez_pc(J,Jf),jogador_computador(Jf,Tab2,Tabf,Pos_PC))) );
 	     (nl, write('Movimento nao valido, tenta novamente!'),nl,sleep(1),clear(10),jogador_computador(J,Tab,Tabf,Pos_PC)) )
 	 ) ).
@@ -438,7 +438,7 @@ move_valida_king(J,Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
 	 (Cn1==Cn2, abs(Ln1-Ln2)=<2);
 	 (abs(Ln1-Ln2)=<2,abs(Ln1-Ln2)=:=abs(Cn1-Cn2)));
 
-        ((J==pc;J==pc1;J==pc2), Op_random is random(7),
+        ((J==pc;J==pc1;J==pc2), Op_random is random(8),
 	 (Op_random==0, AuxCn is Cn1+3,	     Ln2 is Ln1,    random(Cn1,AuxCn,Cn2));
 	 (Op_random==1, AuxCn is Cn1-3,	     Ln2 is Ln1,    random(Cn1,AuxCn,Cn2));
 	 (Op_random==2,	AuxLn is Ln1+3, random(Ln1,AuxLn,Ln2),	   Cn2 is Cn1	 );
@@ -474,7 +474,7 @@ move_valida_sergeants(J,Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
 	 (Cn1==Cn2, abs(Ln1-Ln2)=:=1);
 	 (abs(Ln1-Ln2)=<12, abs(Ln1-Ln2)=:=abs(Cn1-Cn2)));
 
-        ((J==pc;J==pc1;J==pc2), Op_random is random(7),
+        ((J==pc;J==pc1;J==pc2), Op_random is random(8),
 	 (Op_random==0, Ln2 is Ln1, Cn2 is Ln1+1);
 	 (Op_random==1, Ln2 is Ln1, Cn2 is Ln2-1);
 	 (Op_random==2,	Ln2 is Ln1+1, Cn2 is Cn1);
@@ -493,7 +493,7 @@ move_valida_pikemen(J,Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
 	 (Cn1==Cn2, abs(Ln1-Ln2)=<12);
 	 (abs(Ln1-Ln2)=:=1, abs(Cn1-Cn2)=:=1));
 
-        ((J==pc;J==pc1;J==pc2), Op_random is random(7),
+        ((J==pc;J==pc1;J==pc2), Op_random is random(8),
 	 (Op_random==0, Ln2 is Ln1, AuxCn is Cn1+13, random(Cn1,AuxCn,Cn2));
 	 (Op_random==1, Ln2 is Ln1, AuxCn is Cn1-13, random(AuxCn,Cn1,Cn2));
 	 (Op_random==2, Cn2 is Cn1, AuxLn is Ln1+13, random(Ln1,AuxLn,Ln2));
@@ -512,7 +512,7 @@ move_valida_squire(J,Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
 	((abs(Ln1-Ln2)=:=1, abs(Cn1-Cn2)=:=2);
 	 (abs(Ln1-Ln2)=:=2, abs(Cn1-Cn2)=:=1));
 
-        ((J==pc;J==pc1;J==pc2), Op_random is random(7),
+        ((J==pc;J==pc1;J==pc2), Op_random is random(8),
 	 (Op_random==0, Ln2 is Ln1+1, Cn2 is Cn1+2);
 	 (Op_random==1, Ln2 is Ln1+1, Cn2 is Cn1-2);
 	 (Op_random==2, Ln2 is Ln1-1, Cn2 is Cn1+2);
@@ -532,7 +532,7 @@ move_valida_archer(J,Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
 	 (Cn1==Cn2, abs(Ln1-Ln2)=<3);
 	 (abs(Ln1-Ln2)=<3, abs(Ln1-Ln2)=:=abs(Cn1-Cn2)));
 
-        ((J==pc;J==pc1;J==pc2), Op_random is random(7),
+        ((J==pc;J==pc1;J==pc2), Op_random is random(8),
 	 (Op_random==0, AuxCn is Cn1+4,	     Ln2 is Ln1,    random(Cn1,AuxCn,Cn2));
 	 (Op_random==1, AuxCn is Cn1-4,	     Ln2 is Ln1,    random(Cn1,AuxCn,Cn2));
 	 (Op_random==2,	AuxLn is Ln1+4, random(Ln1,AuxLn,Ln2),	   Cn2 is Cn1	 );
@@ -577,7 +577,7 @@ permite_mover(J,Ln,Cn,Tab,Peca):-
 	get_peca_do_tab(J,Ln,Cn,Tab,Peca),
 	((((J==j1;J==pc1), Peca\=aC, Peca\=aG, member(Peca,Pecas_J1)),!);
 	 (((J==j2;J==pc;J==pc2), Peca\=bC, Peca\=bG, member(Peca,Pecas_J2)),!);
-	 write('Casa vazia ou nao se permite mover a peca!'),nl,fail).
+	 (((J==j1;J==j2),write('Casa vazia ou nao se permite mover a peca!'),nl,fail); fail)).
 
 
 vez_jogador(J,Tab):-
