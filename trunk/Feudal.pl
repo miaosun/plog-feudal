@@ -16,58 +16,20 @@ start:-
 	welcome,
 	menu_start.
 
-trocar_vez(j1,j2).
-trocar_vez(j2,j1).
-trocar_vez_pc(j1,pc).
-trocar_vez_pc(pc,j1).
-trocar_vez_pcs(pc1,pc2).
-trocar_vez_pcs(pc2,pc1).
 
-
-%limpa a ecra com N linhas
-clear(0):-!.
-clear(N):- N1 is N-1, nl, !,clear(N1).
-
-%para o utilizador saber que simbolo corresponde que peca
-print_legenda:-
-	write('Legenda:'), tab(9),write('** - Mountains,   ## - Rough Terrain'),nl,
-	tab(3),write('C - Castle,   G - Green,	 K - King,    P - Prince,  D - Duke'),nl,
-	tab(3),write('k - Knights,  S - Sergeants,  s - Squire,  a - Archer,  p - Pikemen'), nl,nl.
-
-welcome:-
-	write('**************************************'),nl,
-	write('*                                    *'),nl,
-	write('*        Bemvindo ao Feudal          *'),nl,
-	write('*                                    *'),nl,
-	write('**************************************'),nl,nl.
-
-menu_start:-
-	write('**************************************'),nl,
-        write('*                                    *'),nl,
-        write('*       Escolhe o mode do jogo:      *'),nl,
-        write('*                                    *'),nl,
-        write('*         1.Humano VS Humano         *'),nl,
-        write('*       2.Humano VS Computador       *'),nl,
-        write('*     3.Computador VS Computador     *'),nl,
-        write('*                                    *'),nl,
-        write('**************************************'),nl,nl,
-	write('Opcao: '), faz_opcao(Op),
-	comeca_jogo(Op).
-
-comeca_jogo(Op):-    %para efeito de teste, ainda não est?implementado
+comeca_jogo(Op):-
        (Op == 1, clear(50),write('\nMode: Humano contra Humano\n'),nl,
-	%estadoInicial(Tab),pecas_J1(Hand1), pecas_J2(Hand2),
-	%insere_todas_pecas(j1,Hand1,Tab,Tab1,_,_),!, clear(50),
-	%insere_todas_pecas(j2,Hand2,Tab1,Tab2,_,_),!, clear(50),
+	estadoInicial(Tab),pecas_J1(Hand1), pecas_J2(Hand2),
+	insere_todas_pecas(j1,Hand1,Tab,Tab1,_,_),!, clear(50),
+	insere_todas_pecas(j2,Hand2,Tab1,Tab2,_,_),!, clear(50),
 
-	estadoTeste2(Tab2),
+	%estadoTeste2(Tab2),
 	jogador_jogador(j1,Tab2,_,[]),!);
 
-       (Op == 2, clear(50),write('\nMode: Humano contra Computador\n'),nl, %menu_nivel,!;
-	%estadoInicial(Tab), pecas_J1(Hand1),
-	pecas_J2(Hand2),
-	%insere_todas_pecas(j1,Hand1,Tab,Tab1,_,_),!, clear(50),
-	estado_inPC(Tab1),
+       (Op == 2, clear(50),write('\nMode: Humano contra Computador\n'),nl, %menu_nivel,!
+	estadoInicial(Tab), pecas_J1(Hand1), pecas_J2(Hand2),
+	insere_todas_pecas(j1,Hand1,Tab,Tab1,_,_),!, clear(50),
+	%estado_inPC(Tab1),
 	insere_todas_pecas(pc,Hand2,Tab1,Tab2,[],Pos_PC),!,clear(50),
 
 	jogador_computador(j1,Tab2,_,Pos_PC),!);
@@ -75,7 +37,7 @@ comeca_jogo(Op):-    %para efeito de teste, ainda não est?implementado
        (Op == 3, clear(50),write('\nMode: Computador contra Computador\n'),nl, %menu_nivel
         estadoInicial(Tab), pecas_J1(Hand1), pecas_J2(Hand2),
 	insere_todas_pecas(pc1,Hand1,Tab,Tab1,[],Pos_PC1),!,clear(50),
-	insere_todas_pecas(pc2,Hand2,Tab1,Tab2,[],Pos_PC2),
+	insere_todas_pecas(pc2,Hand2,Tab1,Tab2,[],Pos_PC2),!,clear(50),
 
 	computador_computador(pc1,Tab2,_,Pos_PC1,Pos_PC2)
 
@@ -94,9 +56,7 @@ insere_todas_pecas(J,Hand,Tab,Tabf,Lis,Pos_PC):-
         jogador(J,NJ),
 
 	write('Player '), write(NJ), write(' hand: '), printList(Hand),nl,nl,
-	write('Escolhe uma peca:'),nl,
-	mostra_hand(Hand,1),nl,
-	write('Peca: '),
+	write('Escolhe uma peca:'),nl, mostra_hand(Hand,1),nl, write('Peca: '),
 	(
 	 ((J==pc;J==pc1;J==pc2), Aux is HandSize+1,
 	  (random(1,Aux,P), write(P),nl,remove_at(Hand,P,Peca,Hand2)),
@@ -111,37 +71,33 @@ insere_todas_pecas(J,Hand,Tab,Tabf,Lis,Pos_PC):-
 	 );   % operacao para jogador PC
 
 	 ((J==j1;J==j2),read(P),
-	  (
-	   (integer(P), P>0, P=<HandSize, remove_at(Hand,P,Peca,Hand2));
-	   (write('Opcao invalida, tenta novamente!'),nl,nl,sleep(1),
-	    insere_todas_pecas(J,Hand,Tab,Tab1,Lis,Pos_PC))),nl,
+	  ( (integer(P), P>0, P=<HandSize, remove_at(Hand,P,Peca,Hand2));
+	    (write('Opcao invalida, tenta novamente!'),nl,nl,sleep(1),
+	     insere_todas_pecas(J,Hand,Tab,Tab1,Lis,Pos_PC)) ),nl,
 
 	  repeat,
 	  ((repeat, (write('Linha: '), read(Ln), linha_valida_inserir(J,Ln))),
-	   (write('Coluna: '), read(Cn), coluna_valida(Cn)),
-	    colocacao_valida(J,Peca,Ln,Cn,Tab)
-	  ),!,
+	   (write('Coluna: '), read(Cn), coluna_valida(Cn)),colocacao_valida(J,Peca,Ln,Cn,Tab)),!,
 
 	  insere_peca_no_tab(Peca,Ln,Cn,Tab,Tab1), insere_todas_pecas(J,Hand2,Tab1,Tabf,Acc,Pos_PC)
 	 )   % operacao para jogador Humano
 	).
 
 
-%verifica se a colocacao da peca e valida, se a peca for C-Castle ou
-%G-Green, permite colocar em qualquer casa do seu reino, outras pecas so
-%podem ser colocadas em casa "vazia"
+%verifica se a colocacao da peca e valida, se a peca for C-Castle ou G-Green, permite colocar em qualquer casa do seu reino,
+%outras pecas so podem ser colocadas em casa "vazia"
 colocacao_valida(J,Peca,Ln,Cn,Tab):-
 	nth(Tab,Ln,LElm),
 	nth(LElm,Cn,Casa),
 	vizinhos(J,Ln,Cn,Tab,LisV),
         get_peca_do_tab(J,Ln,Cn,Tab,PecaTab),
 	(
-	 ((J==j1;J==pc1),
+	 ( (J==j1;J==pc1),
 	    ((Peca==aC, ((PecaTab\=aG, \+peca_esta_no_tab(aG,Tab)); member(aG,LisV)));
 	     (Peca==aG, ((PecaTab\=aC, \+peca_esta_no_tab(aC,Tab)); member(aC,LisV)),assert(posicao_aG(Ln,Cn)));
 	     (Peca\=aC, Peca\=aG, Casa==0)) ),!;
 
-	 ((J==j2;J==pc;J==pc2),
+	 ( (J==j2;J==pc;J==pc2),
             ((Peca==bC, ((PecaTab\=bG, \+peca_esta_no_tab(bG,Tab)); member(bG,LisV)));
 	     (Peca==bG, ((PecaTab\=bC, \+peca_esta_no_tab(bC,Tab)); member(bC,LisV)),assert(posicao_bG(Ln,Cn)));
 	     (Peca\=bC, Peca\=bG, Casa==0)) ),!;
@@ -174,11 +130,7 @@ insere_na_linha(Peca,N,[H|T],[H|T2]):-
 %mostra todas as pecas o jogador tem no momento
 mostra_hand([],_):-!.
 mostra_hand([H|T],N):-
-	N1 is N+1,
-	write(N),
-	write(': '),
-	draw_casa(H),
-	write(' | '),
+	N1 is N+1, write(N),write(': '), draw_casa(H), write(' | '),
 	mostra_hand(T,N1),!.
 
 
@@ -216,9 +168,7 @@ coluna_valida(Cn):-
 	Cn>=1, Cn=<24,!;
 	write('Coluna invalida, tenta novamente!'),nl,fail.
 
-
-%um jogador no maximo pode mover 13 pecas em cada jogada
-%mover_mais_pecas(J,3,Jf):-trocar_vez(J,Jf),!.
+%cada jogador pode movimentar uma ou varias pecas em cada seria de jogada
 mover_mais_pecas(J,Jf,Lpos,Lpos3):-
 	write('Pretende mover mais Pecas? (1: Sim | 2: Nao)'),nl,
 	write('Opcao: '),read(Op),
@@ -242,11 +192,11 @@ jogador_jogador(J,Tab,Tabf,Lpos):-
 	( (repeat, (write('Linha: '), read(Ln1), linha_valida(Ln1))),
 	  (write('Coluna: '), read(Cn1), coluna_valida(Cn1),
 	   permite_mover(J,Ln1,Cn1,Tab,Peca),
-	   sem_repeticoes(Ln1,Cn1,Lpos),!)),nl,nl,
+	   sem_repeticoes(Ln1,Cn1,Lpos),!) ), nl,nl,
 
         get_peca_do_tab(J,Ln1,Cn1,Tab,Peca),
         opcao_archer(Peca,Opcao),!,  %se a peca nao foi Archer, passa a frente
-        (
+       (
          ( Opcao==2,  %quando escolher para atacar
 	  write('Escolhe a posicao pretende atacar'),nl,
           repeat,
@@ -256,27 +206,26 @@ jogador_jogador(J,Tab,Tabf,Lpos):-
 	  get_peca_do_tab(J,Ln2,Cn2,Tab,Casa),
 
 	  ( ( ((J==j1, member(Casa,Pecas_J2)); (J==j2, member(Casa,Pecas_J1))),
-	      verifica_green(J,Casa,Tab),jogada_valida(J,Peca,Ln1,Cn1,Ln2,Cn2,Tab),
+	      verifica_green(J,Casa,Tab), jogada_valida(J,Peca,Ln1,Cn1,Ln2,Cn2,Tab),
 	      remover_do_tab(Ln2,Cn2,Tab,Tab2), %remove a peca doutro jogador qual foi atacada pela Archer
 	      nl,posicoes_alteradas(Ln1,Cn1,Lpos,Lpos2), vez_jogador(J,Tab2),
 	          %guarda a posicao de Archer, nao pode jogar mais com Archer nesse seria de jogadas
 	      ((game_over(J,Tab2), write('Obrigado por jogar!'),nl);
 	       (mover_mais_pecas(J,Jf,Lpos2,Lpos3),
 	        jogador_jogador(Jf,Tab2,Tabf,Lpos3))) );
-	    (nl, write('Opcao invalida, tenta novamente!'),nl,sleep(1),clear(10),jogador_jogador(J,Tab,Tabf,Lpos)))
+	    (nl, write('Opcao invalida, tenta novamente!'),nl,sleep(1),clear(10),jogador_jogador(J,Tab,Tabf,Lpos)) )
          );
 
          (%quando escolher para movimentar, ou quando a peca nao foi Archer
            write('Escolhe a posicao do destino'),nl,
            repeat,
            ( (repeat, (write('Linha: '), read(Ln2), linha_valida(Ln2))),
-	     (write('Coluna: '), read(Cn2), coluna_valida(Cn2))),!,
+	     (write('Coluna: '), read(Cn2), coluna_valida(Cn2)) ),!,
 
 	   get_peca_do_tab(J,Ln2,Cn2,Tab,Casa),
 
 	   ( ( ((J==j1, \+member(Casa,Pecas_J1));(J==j2, \+member(Casa,Pecas_J2))),%verifica se a posicao destino ?uma peca do jogador
-	      verifica_green(J,Casa,Tab),
-	      jogada_valida(J,Peca,Ln1,Cn1,Ln2,Cn2,Tab),
+	      verifica_green(J,Casa,Tab), jogada_valida(J,Peca,Ln1,Cn1,Ln2,Cn2,Tab),
 
 	      archer_aux(Casa,Pecas_J1,Pecas_J2,Opcao,Saida),
 	      ((Saida=yes,remover_do_tab(Ln1,Cn1,Tab,Tab1));  %quando foi um movimento valida, para Archer e outras pecas
@@ -288,8 +237,7 @@ jogador_jogador(J,Tab,Tabf,Lpos):-
 	       (mover_mais_pecas(J,Jf,Lpos2,Lpos3),
 	        jogador_jogador(Jf,Tab2,Tabf,Lpos3))) );
 	     (nl, write('Movimento nao valido, tenta novamente!'),nl,sleep(1),clear(10),jogador_jogador(J,Tab,Tabf,Lpos)) )
-	 )
-      ).
+	 ) ).
 
 
 jogador_computador(J,Tab,Tabf,Pos_PC):-
@@ -300,32 +248,30 @@ jogador_computador(J,Tab,Tabf,Pos_PC):-
 
 	write('Escolhe a posicao da Peca pretende mover'),nl,sleep(2),
 
-     ((	J==pc,
-	repeat,(random_choose(Pos_PC, Peca_PC),nth(Peca_PC,1,Ln1),nth(Peca_PC,2,Cn1), permite_mover(J,Ln1,Cn1,Tab,Peca)),
-	write('Linha: '), write(Ln1),nl, write('Coluna: '), write(Cn1),nl,nl, get_peca_do_tab(J,Ln1,Cn1,Tab,Peca),
-	(
-          write('Escolhe a posicao do destino'),nl,
+       ((J==pc,
+	 repeat,(random_choose(Pos_PC, Peca_PC),nth(Peca_PC,1,Ln1),nth(Peca_PC,2,Cn1), permite_mover(J,Ln1,Cn1,Tab,Peca)),
+	 write('Linha: '), write(Ln1),nl, write('Coluna: '), write(Cn1),nl,nl, get_peca_do_tab(J,Ln1,Cn1,Tab,Peca),
+	 ( write('Escolhe a posicao do destino'),nl,
+           repeat,
+           (jogada_valida(pc,Peca,Ln1,Cn1,Ln2,Cn2,Tab),
+	   (write('Linha: '), write(Ln2),nl, linha_valida(Ln2))),
+	   (write('Coluna: '), write(Cn2), nl, coluna_valida(Cn2)),!,
+
+	   get_peca_do_tab(J,Ln2,Cn2,Tab,Casa),
+
+	   ( ( \+member(Casa,Pecas_J2),verifica_green(J,Casa,Tab), delete(Pos_PC,[Ln1,Cn1],Pos_PC_aux),
+	      remover_do_tab(Ln1,Cn1,Tab,Tab1),insere_peca_no_tab(Peca,Ln2,Cn2,Tab1,Tab2),nl, append([Ln2,Cn2],Pos_PC_aux, Pos_PC_f),
+	      ((game_over(J,Tab2), write('Obrigado por jogar!'),nl);
+	       (trocar_vez_pc(J,Jf),jogador_computador(Jf,Tab2,Tabf,Pos_PC_f)))
+	     );
+	     (nl, write('Movimento nao valido, tenta novamente!'),nl,sleep(1),clear(10),jogador_computador(J,Tab,Tabf,Pos_PC)) ) )
+        );
+
+        (
           repeat,
-          (   jogada_valida(pc,Peca,Ln1,Cn1,Ln2,Cn2,Tab),
-	      (write('Linha: '), write(Ln2),nl, linha_valida(Ln2))),
-	      (write('Coluna: '), write(Cn2), nl, coluna_valida(Cn2)),!,
-
-	  get_peca_do_tab(J,Ln2,Cn2,Tab,Casa),
-
-	  ( ( \+member(Casa,Pecas_J2),verifica_green(J,Casa,Tab),
-	      remover_do_tab(Ln1,Cn1,Tab,Tab1),insere_peca_no_tab(Peca,Ln2,Cn2,Tab1,Tab2),nl,
-	     ((game_over(J,Tab2), write('Obrigado por jogar!'),nl);
-	      (trocar_vez_pc(J,Jf),jogador_computador(Jf,Tab2,Tabf,Pos_PC)))
-	    );
-	    (nl, write('Movimento nao valido, tenta novamente!'),nl,sleep(1),clear(10),jogador_computador(J,Tab,Tabf,Pos_PC)))
-         )
-      );
-
-      (
-         repeat,
-	( (repeat, (write('Linha: '), read(Ln1), linha_valida(Ln1))),
-	  (write('Coluna: '), read(Cn1), coluna_valida(Cn1),
-	   permite_mover(J,Ln1,Cn1,Tab,Peca),!)),nl,nl,
+	 ( (repeat, (write('Linha: '), read(Ln1), linha_valida(Ln1))),
+	   (write('Coluna: '), read(Cn1), coluna_valida(Cn1),
+	    permite_mover(J,Ln1,Cn1,Tab,Peca),!)),nl,nl,
 
            get_peca_do_tab(J,Ln1,Cn1,Tab,Peca),
            write('Escolhe a posicao do destino'),nl,
@@ -340,7 +286,7 @@ jogador_computador(J,Tab,Tabf,Pos_PC):-
 	      ((game_over(J,Tab2), write('Obrigado por jogar!'),nl);
 	       (trocar_vez_pc(J,Jf),jogador_computador(Jf,Tab2,Tabf,Pos_PC))) );
 	     (nl, write('Movimento nao valido, tenta novamente!'),nl,sleep(1),clear(10),jogador_computador(J,Tab,Tabf,Pos_PC)) )
-	 )).
+	 ) ).
 
 computador_computador(J,Tab,Tabf,Pos_PC1,Pos_PC2):-
        (game_over(J,Tab), write('Obrigado por jogar!'),nl);
@@ -350,7 +296,7 @@ computador_computador(J,Tab,Tabf,Pos_PC1,Pos_PC2):-
 
 	write('Escolhe a posicao da Peca pretende mover'),nl,sleep(2),
 
-       ((J==pc2,
+      ( (J==pc2,
 	repeat,(random_choose(Pos_PC2, Peca_PC),nth(Peca_PC,1,Ln1),nth(Peca_PC,2,Cn1), permite_mover(J,Ln1,Cn1,Tab,Peca)),
 	write('Linha: '), write(Ln1),nl, write('Coluna: '), write(Cn1),nl,nl, get_peca_do_tab(J,Ln1,Cn1,Tab,Peca),
 	(
@@ -362,20 +308,18 @@ computador_computador(J,Tab,Tabf,Pos_PC1,Pos_PC2):-
 
 	  get_peca_do_tab(J,Ln2,Cn2,Tab,Casa),
 
-	  ( ( \+member(Casa,Pecas_J2),verifica_green(J,Casa,Tab),
-	      remover_do_tab(Ln1,Cn1,Tab,Tab1),insere_peca_no_tab(Peca,Ln2,Cn2,Tab1,Tab2),nl,
+	  ( ( \+member(Casa,Pecas_J2),verifica_green(J,Casa,Tab), delete(Pos_PC2,[Ln1,Cn1],Pos_PC2_aux),
+	      remover_do_tab(Ln1,Cn1,Tab,Tab1),insere_peca_no_tab(Peca,Ln2,Cn2,Tab1,Tab2),nl, append([Ln2,Cn2],Pos_PC2_aux,Pos_PC2_f),
 	     ((game_over(J,Tab2), write('Obrigado por jogar!'),nl);
-	      (trocar_vez_pcs(J,Jf),computador_computador(Jf,Tab2,Tabf,Pos_PC1,Pos_PC2)))
+	      (trocar_vez_pcs(J,Jf),computador_computador(Jf,Tab2,Tabf,Pos_PC1,Pos_PC2_f)))
 	    );
 	    (nl, write('Movimento nao valido, tenta novamente!'),nl,sleep(1),clear(10),computador_computador(J,Tab,Tabf,Pos_PC1,Pos_PC2)))
-         )
-        );
+         ) );
 
-       (J==pc1,
-	repeat,(random_choose(Pos_PC1, Peca_PC),nth(Peca_PC,1,Ln1),nth(Peca_PC,2,Cn1), permite_mover(J,Ln1,Cn1,Tab,Peca)),
-	write('Linha: '), write(Ln1),nl, write('Coluna: '), write(Cn1),nl,nl, get_peca_do_tab(J,Ln1,Cn1,Tab,Peca),
-	(
-          write('Escolhe a posicao do destino'),nl,
+        (J==pc1,
+	 repeat,(random_choose(Pos_PC1, Peca_PC),nth(Peca_PC,1,Ln1),nth(Peca_PC,2,Cn1), permite_mover(J,Ln1,Cn1,Tab,Peca)),
+	 write('Linha: '), write(Ln1),nl, write('Coluna: '), write(Cn1),nl,nl, get_peca_do_tab(J,Ln1,Cn1,Tab,Peca),
+	 (write('Escolhe a posicao do destino'),nl,
           repeat,
           (   jogada_valida(pc1,Peca,Ln1,Cn1,Ln2,Cn2,Tab),
 	      (write('Linha: '), write(Ln2),nl, linha_valida(Ln2))),
@@ -383,15 +327,13 @@ computador_computador(J,Tab,Tabf,Pos_PC1,Pos_PC2):-
 
 	  get_peca_do_tab(J,Ln2,Cn2,Tab,Casa),
 
-	  ( ( \+member(Casa,Pecas_J1),verifica_green(J,Casa,Tab),
-	      remover_do_tab(Ln1,Cn1,Tab,Tab1),insere_peca_no_tab(Peca,Ln2,Cn2,Tab1,Tab2),nl,
+	  ( ( \+member(Casa,Pecas_J1),verifica_green(J,Casa,Tab), delete(Pos_PC1,[Ln1,Cn1],Pos_PC1_aux),
+	      remover_do_tab(Ln1,Cn1,Tab,Tab1),insere_peca_no_tab(Peca,Ln2,Cn2,Tab1,Tab2),nl, append([Ln2,Cn2],Pos_PC1_aux,Pos_PC1_f),
 	     ((game_over(J,Tab2), write('Obrigado por jogar!'),nl);
-	      (trocar_vez_pcs(J,Jf),computador_computador(Jf,Tab2,Tabf,Pos_PC1,Pos_PC2)))
+	      (trocar_vez_pcs(J,Jf),computador_computador(Jf,Tab2,Tabf,Pos_PC1_f,Pos_PC2)))
 	    );
 	    (nl, write('Movimento nao valido, tenta novamente!'),nl,sleep(1),clear(10),computador_computador(J,Tab,Tabf,Pos_PC1,Pos_PC2)))
-         )
-        )
-       ).
+         ) ) ).
 
 
 %auxiliar para ver se a posicao onde a peca Archer quer movimentar e uma casa com uma peca doutro jogador,
@@ -586,8 +528,7 @@ move_valida_squire(J,Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
 %verifica se o movimento da peca Archer e valida
 move_valida_archer(J,Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
 	(Peca==aa; Peca==ba), \+member(x,Caminho),
-	(
-	 (Ln1==Ln2, abs(Cn1-Cn2)=<3);
+	((Ln1==Ln2, abs(Cn1-Cn2)=<3);
 	 (Cn1==Cn2, abs(Ln1-Ln2)=<3);
 	 (abs(Ln1-Ln2)=<3, abs(Ln1-Ln2)=:=abs(Cn1-Cn2)));
 
@@ -606,8 +547,7 @@ move_valida_archer(J,Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
 %ve se no meio caminho entre 2 posicoes tem alguma pecas, se tiver o movimento nao e valido, pois nao se pode ultrapassar outra peca
 move_valida_aux([_]):-!.
 move_valida_aux(Caminho):-
-	pecas_J1(Pecas_J1), pecas_J2(Pecas_J2),
-	length(Caminho,Size_Caminho),
+	pecas_J1(Pecas_J1), pecas_J2(Pecas_J2), length(Caminho,Size_Caminho),
 	remove_at(Caminho,Size_Caminho,_,Meio),
 	reverse(Meio,Meio2), cabeca(Casa_Meio,Meio2),
 	\+member(Casa_Meio,Pecas_J1), \+member(Casa_Meio,Pecas_J2),
@@ -633,8 +573,7 @@ game_over(J,Tab):-
 
 %cada jogador so pode movimentar as suas pecas, mas nao pode movimentar as pecas Castle e Green
 permite_mover(J,Ln,Cn,Tab,Peca):-
-	pecas_J1(Pecas_J1),
-	pecas_J2(Pecas_J2),
+	pecas_J1(Pecas_J1), pecas_J2(Pecas_J2),
 	get_peca_do_tab(J,Ln,Cn,Tab,Peca),
 	((((J==j1;J==pc1), Peca\=aC, Peca\=aG, member(Peca,Pecas_J1)),!);
 	 (((J==j2;J==pc;J==pc2), Peca\=bC, Peca\=bG, member(Peca,Pecas_J2)),!);
@@ -658,7 +597,6 @@ faz_opcao(Op):-
 
 %LisV - Lista dos vizinhos, serve para restringir a peca Green so pode ser colocada ao lado da Castle, vice versa
 vizinhos(J,Ln,Cn,Tab,LisV):-
-
 	LnMais  is Ln+1,
 	LnMenos is Ln-1,
 	CnMais  is Cn+1,

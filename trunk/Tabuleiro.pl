@@ -42,6 +42,13 @@ jogador(pc,'PC').
 jogador(pc1,'PC1').
 jogador(pc2,'PC2').
 
+trocar_vez(j1,j2).
+trocar_vez(j2,j1).
+trocar_vez_pc(j1,pc).
+trocar_vez_pc(pc,j1).
+trocar_vez_pcs(pc1,pc2).
+trocar_vez_pcs(pc2,pc1).
+
 
 %%%%%%%%  Estado inicial  %%%%%%%%
 estadoInicial([[x,0,0,0,0,0,0,0,0,x,x,0,0,0,0,0,0,0,0,0,0,0,0,x],
@@ -70,8 +77,36 @@ estadoInicial([[x,0,0,0,0,0,0,0,0,x,x,0,0,0,0,0,0,0,0,0,0,0,0,x],
                [x,0,0,0,0,t,x,0,0,0,0,0,0,0,0,0,0,x,x,0,0,0,0,x]]).
 
 
-show:- estadoInicial(X), print_tab(X).  %mostra tabuleiro do estado inicial
-show2:-estadoTeste(X), print_tab(X).	%mostra tabuleiro do estado teste com todas as peças colocadas no tabuleiro
+%limpa a ecra com N linhas
+clear(0):-!.
+clear(N):- N1 is N-1, nl, !,clear(N1).
+
+%para o utilizador saber que simbolo corresponde que peca
+print_legenda:-
+	write('Legenda:'), tab(9),write('** - Mountains,   ## - Rough Terrain'),nl,
+	tab(3),write('C - Castle,   G - Green,	 K - King,    P - Prince,  D - Duke'),nl,
+	tab(3),write('k - Knights,  S - Sergeants,  s - Squire,  a - Archer,  p - Pikemen'), nl,nl.
+
+welcome:-
+	write('**************************************'),nl,
+	write('*                                    *'),nl,
+	write('*        Bemvindo ao Feudal          *'),nl,
+	write('*                                    *'),nl,
+	write('**************************************'),nl,nl.
+
+menu_start:-
+	write('**************************************'),nl,
+        write('*                                    *'),nl,
+        write('*       Escolhe o mode do jogo:      *'),nl,
+        write('*                                    *'),nl,
+        write('*         1.Humano VS Humano         *'),nl,
+        write('*       2.Humano VS Computador       *'),nl,
+        write('*     3.Computador VS Computador     *'),nl,
+        write('*                                    *'),nl,
+        write('**************************************'),nl,nl,
+	write('Opcao: '), faz_opcao(Op),
+	comeca_jogo(Op).
+
 
 %mostra o tabuleiro e as coordenadas respectivemente
 print_tab(Tab):-
