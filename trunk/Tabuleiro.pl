@@ -29,12 +29,10 @@
 % bp - Pikemen   x4
 
 
-
 mountedmen([aP,aD,ak, bP,bD,bk]).
 footmen([aK,aS,as,aa,ap, bK,bS,bs,ba,bp]).
 pecas_J1([aC,aG,aK,aP,aD, ak,ak,aS,aS,as,aa,ap,ap,ap,ap]).
 pecas_J2([bC,bG,bK,bP,bD, bk,bk,bS,bS,bs,ba,bp,bp,bp,bp]).
-
 
 jogador(j1,1).
 jogador(j2,2).
@@ -106,6 +104,17 @@ menu_start:-
         write('**************************************'),nl,nl,
 	write('Opcao: '), faz_opcao(Op),
 	comeca_jogo(Op).
+
+
+%funcao auxiliar para verificar se a opcao do utilizador e valida
+opcao_invalida(Op):-
+	Op \== 1, Op \== 2, Op \== 3.
+
+%procede a opcao do utilizador
+faz_opcao(Op):-
+	read(Op),
+	\+opcao_invalida(Op),!;
+	writeln('opcao invalida, tenta novamente'), write('Opcao: '), faz_opcao(Op),!.
 
 
 %mostra o tabuleiro e as coordenadas respectivemente
@@ -187,22 +196,6 @@ menu_nivel:-
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%% estado para testar visualização do tabuleiro %%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -251,7 +244,7 @@ estadoTeste2([[x,0,0,0,0,0,0,0,0,x,x,0,0,0,0,0,0,0,0,0,0,0,0,x],
               [0,0,0,0,0,0,0,0,0,0,0,0,0,0,aa,0,0,0,0,0,0,0,0,0],
               [0,0,0,0,0,0,0,0,0,0,x,0,0,0,t,x,0,0,t,x,x,0,0,0],
               [0,0,0,0,t,x,0,0,0,0,0,0,0,0,0,0,bp,bp,bs,0,x,0,0,0],
-              [0,0,0,0,x,x,0,0,0,0,0,0,0,0,0,0,bS,bk,bp,ba,0,0,0,0],
+              [0,0,0,0,x,x,0,0,0,0,0,0,0,0,0,bS,0,bk,bp,ba,0,0,0,0],
               [t,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,x,x,t,bK,0,0,0],
               [x,x,0,0,0,x,x,0,0,0,0,0,0,0,0,0,bS,x,bG,bC,bP,0,0,0],
               [0,0,0,0,0,t,x,0,0,0,0,0,0,0,0,x,x,x,x,0,bD,0,0,0],
