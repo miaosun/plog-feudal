@@ -246,25 +246,24 @@ jogador_computador(J,Tab,Tabf,Pos_PC):-
         print_legenda,
 	pecas_J1(Pecas_J1), pecas_J2(Pecas_J2),
 
-	write('Escolhe a posicao da Peca pretende mover'),nl,sleep(2),
-
        ((J==pc,
 	 repeat,(random_choose(Pos_PC, Peca_PC),nth(Peca_PC,1,Ln1),nth(Peca_PC,2,Cn1), permite_mover(J,Ln1,Cn1,Tab,Peca)),
-	 write('Linha: '), write(Ln1),nl, write('Coluna: '), write(Cn1),nl,nl, get_peca_do_tab(J,Ln1,Cn1,Tab,Peca),
-	 ( write('Escolhe a posicao do destino'),nl,
-           repeat,
-           (jogada_valida(pc,Peca,Ln1,Cn1,Ln2,Cn2,Tab),
-	   (write('Linha: '), write(Ln2),nl, linha_valida(Ln2))),
-	   (write('Coluna: '), write(Cn2), nl, coluna_valida(Cn2)),!,
-
+	 get_peca_do_tab(J,Ln1,Cn1,Tab,Peca),
+	 ( repeat,(jogada_valida(pc,Peca,Ln1,Cn1,Ln2,Cn2,Tab), linha_valida(Ln2), coluna_valida(Cn2)),!,
 	   get_peca_do_tab(J,Ln2,Cn2,Tab,Casa),
 
 	   ( ( \+member(Casa,Pecas_J2),verifica_green(J,Casa,Tab), delete(Pos_PC,[Ln1,Cn1],Pos_PC_aux),
 	      remover_do_tab(Ln1,Cn1,Tab,Tab1),insere_peca_no_tab(Peca,Ln2,Cn2,Tab1,Tab2),nl, append([Ln2,Cn2],Pos_PC_aux, Pos_PC_f),
+
+	       write('Escolhe a posicao da Peca pretende mover'),nl,
+	       write('Linha: '), write(Ln1),nl, write('Coluna: '), write(Cn1),nl,nl,
+	       write('Escolhe a posicao do destino'),nl,
+	       write('Linha: '), write(Ln2),nl, write('Coluna: '), write(Cn2), nl, sleep(2),
+
 	      ((game_over(J,Tab2),vez_jogador(J,Tab2), write('Obrigado por jogar!'),nl);
 	       (trocar_vez_pc(J,Jf),jogador_computador(Jf,Tab2,Tabf,Pos_PC_f)))
 	     );
-	     (nl, write('Movimento nao valido, tenta novamente!'),nl,sleep(1),clear(10),jogador_computador(J,Tab,Tabf,Pos_PC)) ) )
+	     (nl,sleep(1),clear(10),jogador_computador(J,Tab,Tabf,Pos_PC)) ) )
         );
 
         (
@@ -294,45 +293,44 @@ computador_computador(J,Tab,Tabf,Pos_PC1,Pos_PC2):-
         print_legenda,
 	pecas_J1(Pecas_J1), pecas_J2(Pecas_J2),
 
-	write('Escolhe a posicao da Peca pretende mover'),nl,sleep(2),
-
       ( (J==pc2,
 	repeat,(random_choose(Pos_PC2, Peca_PC),nth(Peca_PC,1,Ln1),nth(Peca_PC,2,Cn1), permite_mover(J,Ln1,Cn1,Tab,Peca)),
-	write('Linha: '), write(Ln1),nl, write('Coluna: '), write(Cn1),nl,nl, get_peca_do_tab(J,Ln1,Cn1,Tab,Peca),
-	(
-          write('Escolhe a posicao do destino'),nl,
-          repeat,
-          (   jogada_valida(pc2,Peca,Ln1,Cn1,Ln2,Cn2,Tab),
-	      (write('Linha: '), write(Ln2),nl, linha_valida(Ln2))),
-	      (write('Coluna: '), write(Cn2), nl, coluna_valida(Cn2)),!,
-
+	get_peca_do_tab(J,Ln1,Cn1,Tab,Peca),
+	( repeat,(jogada_valida(pc2,Peca,Ln1,Cn1,Ln2,Cn2,Tab), linha_valida(Ln2), coluna_valida(Cn2)),!,
 	  get_peca_do_tab(J,Ln2,Cn2,Tab,Casa),
 
 	  ( ( \+member(Casa,Pecas_J2),verifica_green(J,Casa,Tab), delete(Pos_PC2,[Ln1,Cn1],Pos_PC2_aux),
 	      remover_do_tab(Ln1,Cn1,Tab,Tab1),insere_peca_no_tab(Peca,Ln2,Cn2,Tab1,Tab2),nl, append([Ln2,Cn2],Pos_PC2_aux,Pos_PC2_f),
+
+	      write('Escolhe a posicao da Peca pretende mover'),nl,
+	      write('Linha: '), write(Ln1),nl, write('Coluna: '), write(Cn1),nl,nl,
+	      write('Escolhe a posicao do destino'),nl,
+              write('Linha: '), write(Ln2),nl, write('Coluna: '), write(Cn2), nl, sleep(2),
+
 	     ((game_over(J,Tab2), write('Obrigado por jogar!'),nl);
 	      (trocar_vez_pcs(J,Jf),computador_computador(Jf,Tab2,Tabf,Pos_PC1,Pos_PC2_f)))
 	    );
-	    (nl, write('Movimento nao valido, tenta novamente!'),nl,sleep(1),clear(10),computador_computador(J,Tab,Tabf,Pos_PC1,Pos_PC2)))
+	    (nl,sleep(1),clear(10),computador_computador(J,Tab,Tabf,Pos_PC1,Pos_PC2)))
          ) );
 
         (J==pc1,
 	 repeat,(random_choose(Pos_PC1, Peca_PC),nth(Peca_PC,1,Ln1),nth(Peca_PC,2,Cn1), permite_mover(J,Ln1,Cn1,Tab,Peca)),
-	 write('Linha: '), write(Ln1),nl, write('Coluna: '), write(Cn1),nl,nl, get_peca_do_tab(J,Ln1,Cn1,Tab,Peca),
-	 (write('Escolhe a posicao do destino'),nl,
-          repeat,
-          (   jogada_valida(pc1,Peca,Ln1,Cn1,Ln2,Cn2,Tab),
-	      (write('Linha: '), write(Ln2),nl, linha_valida(Ln2))),
-	      (write('Coluna: '), write(Cn2), nl, coluna_valida(Cn2)),!,
-
-	  get_peca_do_tab(J,Ln2,Cn2,Tab,Casa),
+	 get_peca_do_tab(J,Ln1,Cn1,Tab,Peca),
+	 ( repeat,(jogada_valida(pc1,Peca,Ln1,Cn1,Ln2,Cn2,Tab), linha_valida(Ln2), coluna_valida(Cn2)),!,
+	   get_peca_do_tab(J,Ln2,Cn2,Tab,Casa),
 
 	  ( ( \+member(Casa,Pecas_J1),verifica_green(J,Casa,Tab), delete(Pos_PC1,[Ln1,Cn1],Pos_PC1_aux),
 	      remover_do_tab(Ln1,Cn1,Tab,Tab1),insere_peca_no_tab(Peca,Ln2,Cn2,Tab1,Tab2),nl, append([Ln2,Cn2],Pos_PC1_aux,Pos_PC1_f),
+
+	     write('Escolhe a posicao da Peca pretende mover'),nl,
+	     write('Linha: '), write(Ln1),nl, write('Coluna: '), write(Cn1),nl,nl,
+             write('Escolhe a posicao do destino'),nl,
+	     write('Linha: '), write(Ln2),nl, write('Coluna: '), write(Cn2), nl, sleep(2),
+
 	     ((game_over(J,Tab2), write('Obrigado por jogar!'),nl);
 	      (trocar_vez_pcs(J,Jf),computador_computador(Jf,Tab2,Tabf,Pos_PC1_f,Pos_PC2)))
 	    );
-	    (nl, write('Movimento nao valido, tenta novamente!'),nl,sleep(1),clear(10),computador_computador(J,Tab,Tabf,Pos_PC1,Pos_PC2)))
+	    (nl,sleep(1),clear(10),computador_computador(J,Tab,Tabf,Pos_PC1,Pos_PC2)))
          ) ) ).
 
 
@@ -440,7 +438,7 @@ move_valida_king(J,Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
 
         ((J==pc;J==pc1;J==pc2), Op_random is random(8),
 	 (Op_random==0, AuxCn is Cn1+3,	     Ln2 is Ln1,    random(Cn1,AuxCn,Cn2));
-	 (Op_random==1, AuxCn is Cn1-3,	     Ln2 is Ln1,    random(Cn1,AuxCn,Cn2));
+	 (Op_random==1, AuxCn is Cn1-3,	     Ln2 is Ln1,    random(AuxCn,Cn1,Cn2));
 	 (Op_random==2,	AuxLn is Ln1+3, random(Ln1,AuxLn,Ln2),	   Cn2 is Cn1	 );
 	 (Op_random==3, AuxLn is Ln1-3, random(AuxLn,Ln1,Ln2),	   Cn2 is Cn1	 );
 	 (Op_random==4, AuxLn is Ln1+3, random(Ln1,AuxLn,Ln2), Cn2 is Ln2-Ln1+Cn1);
@@ -534,7 +532,7 @@ move_valida_archer(J,Peca,Ln1,Cn1,Ln2,Cn2,Caminho):-
 
         ((J==pc;J==pc1;J==pc2), Op_random is random(8),
 	 (Op_random==0, AuxCn is Cn1+4,	     Ln2 is Ln1,    random(Cn1,AuxCn,Cn2));
-	 (Op_random==1, AuxCn is Cn1-4,	     Ln2 is Ln1,    random(Cn1,AuxCn,Cn2));
+	 (Op_random==1, AuxCn is Cn1-4,	     Ln2 is Ln1,    random(AuxCn,Cn1,Cn2));
 	 (Op_random==2,	AuxLn is Ln1+4, random(Ln1,AuxLn,Ln2),	   Cn2 is Cn1	 );
 	 (Op_random==3, AuxLn is Ln1-4, random(AuxLn,Ln1,Ln2),	   Cn2 is Cn1	 );
 	 (Op_random==4, AuxLn is Ln1+4, random(Ln1,AuxLn,Ln2), Cn2 is Ln2-Ln1+Cn1);
