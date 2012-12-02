@@ -26,8 +26,9 @@ comeca_jogo(Op):-
 	humano_humano(j1,Tab2,_,[]),!);
 
        (Op == 2, clear(50),write('\nMode: Humano contra Computador\n'),nl,
-	estadoInicial(Tab), pecas_J1(Hand1), pecas_J2(Hand2),
-%	insere_todas_pecas(j1,Hand1,Tab,Tab1,_,_),!, clear(50),
+	%estadoInicial(Tab),
+	pecas_J1(Hand1), pecas_J2(Hand2),
+	%insere_todas_pecas(j1,Hand1,Tab,Tab1,_,_),!, clear(50),
 	estado_inPC(Tab1),
 	insere_todas_pecas(pc,Hand2,Tab1,Tab2,[],Pos_PC),!,clear(50),
 
